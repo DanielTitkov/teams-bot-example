@@ -10,3 +10,6 @@ auth:
   secret: secret-key
 job: 
   sampleJobPeriod: 20 # seconds
+teams:
+  appID: ""
+  appPassword: ""

@@ -5,6 +5,7 @@ import (
 
 	"github.com/DanielTitkov/teams-bot-example/internal/configs"
 	"github.com/DanielTitkov/teams-bot-example/internal/logger"
+	"github.com/DanielTitkov/teams-bot-example/internal/teams"
 	_ "github.com/lib/pq"
 )
 
@@ -18,6 +19,9 @@ func main() {
 		logger.Fatal("failed to load config", err)
 	}
 	logger.Info("loaded config", fmt.Sprintf("%+v", cfg))
+
+	t := teams.NewTeams(cfg, logger)
+	t.Serve()
 
 	// app := app.NewApp(cfg, logger, repo)
 

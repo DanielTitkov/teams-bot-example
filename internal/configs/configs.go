@@ -12,6 +12,7 @@ type Config struct {
 	DB     DBConfig
 	Server ServerConfig
 	Job    JobConfig
+	Teams  TeamsConfig
 }
 
 func ReadConfigs(path string) (Config, error) {
