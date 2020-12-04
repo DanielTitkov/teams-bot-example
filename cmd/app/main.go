@@ -23,9 +23,11 @@ func main() {
 
 	app := app.NewApp(cfg, logger)
 
-	t := teams.NewTeams(app, cfg, logger)
+	t := teams.NewTeams(cfg, logger)
 	t.SetOnMessageHandler(app.HandleMessage)
-	t.Serve()
+	t.SetOnInvokeHandler(app.HandleInvoke)
+	t.SetOnUpdateHandler(app.HandleUpdate)
+	logger.Fatal("failed to start teams service", t.Listen())
 
 	// server := prepare.NewServer(cfg, logger, app)
 	// logger.Fatal("failed to start server", server.Start(cfg.Server.GetAddress()))

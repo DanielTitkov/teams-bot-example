@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/DanielTitkov/teams-bot-example/internal/app"
 	"github.com/DanielTitkov/teams-bot-example/internal/configs"
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
 	"github.com/DanielTitkov/teams-bot-example/internal/logger"
@@ -22,10 +21,11 @@ type Teams struct {
 	cfg              configs.Config
 	logger           *logger.Logger
 	onMessageHandler func(domain.Message) domain.Message
+	onInvokeHandler  func(domain.Message) domain.Message
+	onUpdateHandler  func(domain.Message) domain.Message
 }
 
 func NewTeams(
-	app *app.App,
 	cfg configs.Config,
 	logger *logger.Logger,
 ) *Teams {
@@ -50,21 +50,30 @@ func (t *Teams) SetOnMessageHandler(handler func(domain.Message) domain.Message)
 	t.onMessageHandler = handler
 }
 
-func (t *Teams) ProcessMessage(w http.ResponseWriter, req *http.Request) {
-	ctx := context.Background()
+func (t *Teams) SetOnInvokeHandler(handler func(domain.Message) domain.Message) {
+	t.onInvokeHandler = handler
+}
 
-	if t.onMessageHandler == nil {
-		err := errors.New("message handler required")
-		t.logger.Error("On message handler is not set", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+func (t *Teams) SetOnUpdateHandler(handler func(domain.Message) domain.Message) {
+	t.onUpdateHandler = handler
+}
+
+func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
+	ctx := context.Background()
 
 	var handler = activity.HandlerFuncs{
 		OnMessageFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
 			response := t.onMessageHandler(domain.Message{
 				Text: turn.Activity.Text,
 			})
+			return turn.SendActivity(activity.MsgOptionText(response.Text))
+		},
+		OnInvokeFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
+			response := t.onInvokeHandler(domain.Message{})
+			return turn.SendActivity(activity.MsgOptionText(response.Text))
+		},
+		OnConversationUpdateFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
+			response := t.onUpdateHandler(domain.Message{})
 			return turn.SendActivity(activity.MsgOptionText(response.Text))
 		},
 	}
@@ -85,9 +94,25 @@ func (t *Teams) ProcessMessage(w http.ResponseWriter, req *http.Request) {
 	t.logger.Info("Request processed successfully", "")
 }
 
-func (t *Teams) Serve() {
-	http.HandleFunc("/api/messages", t.ProcessMessage)
+func (t *Teams) Listen() error {
+	if t.onMessageHandler == nil {
+		err := errors.New("message handler required")
+		return err
+	}
+
+	if t.onInvokeHandler == nil {
+		err := errors.New("invoke handler required")
+		return err
+	}
+
+	if t.onUpdateHandler == nil {
+		err := errors.New("update handler required")
+		return err
+	}
+
+	http.HandleFunc("/api/messages", t.processMessage)
 	port := fmt.Sprintf(":%d", t.cfg.Teams.Port)
 	t.logger.Info("Listening for teams messages", "port "+port)
 	http.ListenAndServe(port, nil)
+	return nil
 }
