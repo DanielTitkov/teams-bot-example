@@ -1,9 +1,9 @@
 package app
 
 import (
-	"github.com/DanielTitkov/go-ent-echo-template/internal/configs"
-	"github.com/DanielTitkov/go-ent-echo-template/internal/domain"
-	"github.com/DanielTitkov/go-ent-echo-template/internal/logger"
+	"github.com/DanielTitkov/teams-bot-example/internal/configs"
+	"github.com/DanielTitkov/teams-bot-example/internal/domain"
+	"github.com/DanielTitkov/teams-bot-example/internal/logger"
 )
 
 type (
@@ -23,11 +23,11 @@ type (
 func NewApp(
 	cfg configs.Config,
 	logger *logger.Logger,
-	repo Repository,
+	// repo Repository,
 ) *App {
 	return &App{
 		cfg:    cfg,
 		logger: logger,
-		repo:   repo,
+		// repo:   repo,
 	}
 }

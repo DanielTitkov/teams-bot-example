@@ -3,7 +3,7 @@ package app
 import (
 	"time"
 
-	"github.com/DanielTitkov/go-ent-echo-template/internal/domain"
+	"github.com/DanielTitkov/teams-bot-example/internal/domain"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )

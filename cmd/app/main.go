@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/DanielTitkov/teams-bot-example/internal/app"
 	"github.com/DanielTitkov/teams-bot-example/internal/configs"
 	"github.com/DanielTitkov/teams-bot-example/internal/logger"
 	"github.com/DanielTitkov/teams-bot-example/internal/teams"
@@ -20,10 +21,11 @@ func main() {
 	}
 	logger.Info("loaded config", fmt.Sprintf("%+v", cfg))
 
-	t := teams.NewTeams(cfg, logger)
-	t.Serve()
+	app := app.NewApp(cfg, logger)
 
-	// app := app.NewApp(cfg, logger, repo)
+	t := teams.NewTeams(app, cfg, logger)
+	t.SetOnMessageHandler(app.HandleMessage)
+	t.Serve()
 
 	// server := prepare.NewServer(cfg, logger, app)
 	// logger.Fatal("failed to start server", server.Start(cfg.Server.GetAddress()))

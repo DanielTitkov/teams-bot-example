@@ -11,3 +11,7 @@ db:
 .PHONY: entgen
 entgen:
 	cd internal/repository/entgo && go generate ./ent
+
+.PHONY: expose
+expose:
+	/home/titkovd/Desktop/ngrok http 3978
