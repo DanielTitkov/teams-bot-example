@@ -2,6 +2,7 @@ package teams
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -23,6 +24,7 @@ type Teams struct {
 	onMessageHandler func(domain.Message) domain.Message
 	onInvokeHandler  func(domain.Message) domain.Message
 	onUpdateHandler  func(domain.Message) domain.Message
+	proactiveChan    <-chan domain.Message
 }
 
 func NewTeams(
@@ -58,6 +60,10 @@ func (t *Teams) SetOnUpdateHandler(handler func(domain.Message) domain.Message) 
 	t.onUpdateHandler = handler
 }
 
+func (t *Teams) SetProactiveChannel(ch chan domain.Message) {
+	t.proactiveChan = ch
+}
+
 func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
 
@@ -78,20 +84,27 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 		},
 	}
 
-	activity, err := t.adapter.ParseRequest(ctx, req)
+	act, err := t.adapter.ParseRequest(ctx, req)
 	if err != nil {
 		t.logger.Error("Failed to parse request", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = t.adapter.ProcessActivity(ctx, activity, handler)
+	// Set conversation reference
+	var conversationRef schema.ConversationReference
+	conversationRef = activity.GetCoversationReference(act)
+	fmt.Printf("REF %+v\n", conversationRef) // TODO store somewhere ref
+
+	err = t.adapter.ProcessActivity(ctx, act, handler)
 	if err != nil {
 		t.logger.Error("Failed to process request", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	t.logger.Info("Request processed successfully", "")
+
+	// Send proactive message
 }
 
 func (t *Teams) Listen() error {
@@ -115,4 +128,46 @@ func (t *Teams) Listen() error {
 	t.logger.Info("Listening for teams messages", "port "+port)
 	http.ListenAndServe(port, nil)
 	return nil
+}
+
+func (t *Teams) RunProactiveManager() {
+	for {
+		select {
+		case message := <-t.proactiveChan:
+			t.sendMessage(message)
+		}
+	}
+}
+
+func (t *Teams) sendMessage(message domain.Message) {
+	var ref schema.ConversationReference
+	err := json.Unmarshal([]byte(message.DialogData), &ref)
+	if err != nil {
+		t.logger.Error("Failed to unmarshal conversation reference", err)
+		return
+	}
+
+	var proactiveHandler = activity.HandlerFuncs{
+		OnMessageFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
+			var obj map[string]interface{}
+			err := json.Unmarshal([]byte(message.Attachment), &obj)
+			if err != nil {
+				return schema.Activity{}, err
+			}
+			attachments := []schema.Attachment{
+				{
+					ContentType: "application/vnd.microsoft.card.adaptive",
+					Content:     obj,
+				},
+			}
+			return turn.SendActivity(activity.MsgOptionText("Sample attachment"), activity.MsgOptionAttachments(attachments))
+		},
+	}
+
+	err = t.adapter.ProactiveMessage(context.TODO(), ref, proactiveHandler)
+	if err != nil {
+		t.logger.Error("Failed to send proactive message.", err)
+		return
+	}
+	t.logger.Info("Proactive message sent successfully.", fmt.Sprintf("%+v", message))
 }

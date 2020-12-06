@@ -14,6 +14,8 @@ type (
 	}
 	// Message is used for messagers
 	Message struct {
-		Text string
+		Text       string
+		DialogData string
+		Attachment string
 	}
 )
