@@ -18,4 +18,16 @@ type (
 		DialogData string
 		Attachment string
 	}
+	// Dialog holds dialog reference in different messagers
+	Dialog struct {
+		ID   int
+		User string // username
+		Meta DialogMeta
+	}
+	// DialogMeta for messagers
+	DialogMeta struct {
+		Teams    string
+		Telegram string // for example
+		Slack    string // for example
+	}
 )

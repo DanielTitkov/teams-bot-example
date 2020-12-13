@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/DanielTitkov/go-ent-echo-template v0.0.0-20201129201101-237b7f0cafca
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/facebook/ent v0.4.2
 	github.com/infracloudio/msbotbuilder-go v0.2.2
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/lib/pq v1.8.0

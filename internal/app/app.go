@@ -23,11 +23,11 @@ type (
 func NewApp(
 	cfg configs.Config,
 	logger *logger.Logger,
-	// repo Repository,
+	repo Repository,
 ) *App {
 	return &App{
 		cfg:    cfg,
 		logger: logger,
-		// repo:   repo,
+		repo:   repo,
 	}
 }
