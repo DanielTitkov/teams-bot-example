@@ -92,6 +92,7 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Set conversation reference
+	// TODO: probably move this to handler and pass to app
 	var conversationRef schema.ConversationReference
 	conversationRef = activity.GetCoversationReference(act)
 	fmt.Printf("REF %+v\n", conversationRef) // TODO store somewhere ref
@@ -103,8 +104,6 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	t.logger.Info("Request processed successfully", "")
-
-	// Send proactive message
 }
 
 func (t *Teams) Listen() error {

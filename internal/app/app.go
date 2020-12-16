@@ -17,6 +17,15 @@ type (
 		CreateUser(*domain.User) (*domain.User, error)
 		GetUserByUsername(username string) (*domain.User, error)
 		GetUserCount() (int, error)
+
+		// messages
+		// CreateDialog(*domain.User, *domain.Dialog) (*domain.Dialog, error)
+		// GetUserDialog(*domain.User) (*domain.Dialog, error)
+		// CreateMessage(*domain.Message) (*domain.Message, error)
+
+		// projects
+		// CreateProject()
+		// GetProjects()
 	}
 )
 
