@@ -16,9 +16,13 @@ type User struct {
 func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("username").Unique().NotEmpty(),
+		field.String("display_name").Optional(),
 		field.String("email").Unique().NotEmpty(),
 		field.String("password_hash"),
 		field.Bool("service").Default(false),
+		field.String("teams_id").Optional().Nillable().Unique(),
+		field.String("telegram_id").Optional().Nillable().Unique(),
+		field.String("slack_id").Optional().Nillable().Unique(),
 	}
 }
 

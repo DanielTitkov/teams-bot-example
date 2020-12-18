@@ -100,18 +100,15 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 
 func (t *Teams) Listen() error {
 	if t.onMessageHandler == nil {
-		err := errors.New("message handler required")
-		return err
+		return errors.New("message handler required")
 	}
 
 	if t.onInvokeHandler == nil {
-		err := errors.New("invoke handler required")
-		return err
+		return errors.New("invoke handler required")
 	}
 
 	if t.onUpdateHandler == nil {
-		err := errors.New("update handler required")
-		return err
+		return errors.New("update handler required")
 	}
 
 	http.HandleFunc("/api/messages", t.processMessage)
@@ -173,8 +170,8 @@ func (t *Teams) activityToMessage(turn *activity.TurnContext) domain.Message {
 		},
 		User: domain.UserMeta{
 			Teams: domain.UserMessagerData{
-				ID:       conversationRef.User.ID,
-				Username: conversationRef.User.Name,
+				ID:       &conversationRef.User.ID,
+				Username: &conversationRef.User.Name,
 			},
 		},
 		Err: err,

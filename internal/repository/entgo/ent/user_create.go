@@ -55,6 +55,20 @@ func (uc *UserCreate) SetUsername(s string) *UserCreate {
 	return uc
 }
 
+// SetDisplayName sets the display_name field.
+func (uc *UserCreate) SetDisplayName(s string) *UserCreate {
+	uc.mutation.SetDisplayName(s)
+	return uc
+}
+
+// SetNillableDisplayName sets the display_name field if the given value is not nil.
+func (uc *UserCreate) SetNillableDisplayName(s *string) *UserCreate {
+	if s != nil {
+		uc.SetDisplayName(*s)
+	}
+	return uc
+}
+
 // SetEmail sets the email field.
 func (uc *UserCreate) SetEmail(s string) *UserCreate {
 	uc.mutation.SetEmail(s)
@@ -77,6 +91,48 @@ func (uc *UserCreate) SetService(b bool) *UserCreate {
 func (uc *UserCreate) SetNillableService(b *bool) *UserCreate {
 	if b != nil {
 		uc.SetService(*b)
+	}
+	return uc
+}
+
+// SetTeamsID sets the teams_id field.
+func (uc *UserCreate) SetTeamsID(s string) *UserCreate {
+	uc.mutation.SetTeamsID(s)
+	return uc
+}
+
+// SetNillableTeamsID sets the teams_id field if the given value is not nil.
+func (uc *UserCreate) SetNillableTeamsID(s *string) *UserCreate {
+	if s != nil {
+		uc.SetTeamsID(*s)
+	}
+	return uc
+}
+
+// SetTelegramID sets the telegram_id field.
+func (uc *UserCreate) SetTelegramID(s string) *UserCreate {
+	uc.mutation.SetTelegramID(s)
+	return uc
+}
+
+// SetNillableTelegramID sets the telegram_id field if the given value is not nil.
+func (uc *UserCreate) SetNillableTelegramID(s *string) *UserCreate {
+	if s != nil {
+		uc.SetTelegramID(*s)
+	}
+	return uc
+}
+
+// SetSlackID sets the slack_id field.
+func (uc *UserCreate) SetSlackID(s string) *UserCreate {
+	uc.mutation.SetSlackID(s)
+	return uc
+}
+
+// SetNillableSlackID sets the slack_id field if the given value is not nil.
+func (uc *UserCreate) SetNillableSlackID(s *string) *UserCreate {
+	if s != nil {
+		uc.SetSlackID(*s)
 	}
 	return uc
 }
@@ -229,6 +285,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		})
 		u.Username = value
 	}
+	if value, ok := uc.mutation.DisplayName(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldDisplayName,
+		})
+		u.DisplayName = value
+	}
 	if value, ok := uc.mutation.Email(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -252,6 +316,30 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldService,
 		})
 		u.Service = value
+	}
+	if value, ok := uc.mutation.TeamsID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldTeamsID,
+		})
+		u.TeamsID = &value
+	}
+	if value, ok := uc.mutation.TelegramID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldTelegramID,
+		})
+		u.TelegramID = &value
+	}
+	if value, ok := uc.mutation.SlackID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldSlackID,
+		})
+		u.SlackID = &value
 	}
 	if nodes := uc.mutation.DialogIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

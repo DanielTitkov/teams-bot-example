@@ -114,6 +114,13 @@ func Username(v string) predicate.User {
 	})
 }
 
+// DisplayName applies equality check predicate on the "display_name" field. It's identical to DisplayNameEQ.
+func DisplayName(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDisplayName), v))
+	})
+}
+
 // Email applies equality check predicate on the "email" field. It's identical to EmailEQ.
 func Email(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -132,6 +139,27 @@ func PasswordHash(v string) predicate.User {
 func Service(v bool) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldService), v))
+	})
+}
+
+// TeamsID applies equality check predicate on the "teams_id" field. It's identical to TeamsIDEQ.
+func TeamsID(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTeamsID), v))
+	})
+}
+
+// TelegramID applies equality check predicate on the "telegram_id" field. It's identical to TelegramIDEQ.
+func TelegramID(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTelegramID), v))
+	})
+}
+
+// SlackID applies equality check predicate on the "slack_id" field. It's identical to SlackIDEQ.
+func SlackID(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSlackID), v))
 	})
 }
 
@@ -398,6 +426,131 @@ func UsernameContainsFold(v string) predicate.User {
 	})
 }
 
+// DisplayNameEQ applies the EQ predicate on the "display_name" field.
+func DisplayNameEQ(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDisplayName), v))
+	})
+}
+
+// DisplayNameNEQ applies the NEQ predicate on the "display_name" field.
+func DisplayNameNEQ(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldDisplayName), v))
+	})
+}
+
+// DisplayNameIn applies the In predicate on the "display_name" field.
+func DisplayNameIn(vs ...string) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldDisplayName), v...))
+	})
+}
+
+// DisplayNameNotIn applies the NotIn predicate on the "display_name" field.
+func DisplayNameNotIn(vs ...string) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldDisplayName), v...))
+	})
+}
+
+// DisplayNameGT applies the GT predicate on the "display_name" field.
+func DisplayNameGT(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldDisplayName), v))
+	})
+}
+
+// DisplayNameGTE applies the GTE predicate on the "display_name" field.
+func DisplayNameGTE(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldDisplayName), v))
+	})
+}
+
+// DisplayNameLT applies the LT predicate on the "display_name" field.
+func DisplayNameLT(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldDisplayName), v))
+	})
+}
+
+// DisplayNameLTE applies the LTE predicate on the "display_name" field.
+func DisplayNameLTE(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldDisplayName), v))
+	})
+}
+
+// DisplayNameContains applies the Contains predicate on the "display_name" field.
+func DisplayNameContains(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldDisplayName), v))
+	})
+}
+
+// DisplayNameHasPrefix applies the HasPrefix predicate on the "display_name" field.
+func DisplayNameHasPrefix(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldDisplayName), v))
+	})
+}
+
+// DisplayNameHasSuffix applies the HasSuffix predicate on the "display_name" field.
+func DisplayNameHasSuffix(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldDisplayName), v))
+	})
+}
+
+// DisplayNameIsNil applies the IsNil predicate on the "display_name" field.
+func DisplayNameIsNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldDisplayName)))
+	})
+}
+
+// DisplayNameNotNil applies the NotNil predicate on the "display_name" field.
+func DisplayNameNotNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldDisplayName)))
+	})
+}
+
+// DisplayNameEqualFold applies the EqualFold predicate on the "display_name" field.
+func DisplayNameEqualFold(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldDisplayName), v))
+	})
+}
+
+// DisplayNameContainsFold applies the ContainsFold predicate on the "display_name" field.
+func DisplayNameContainsFold(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldDisplayName), v))
+	})
+}
+
 // EmailEQ applies the EQ predicate on the "email" field.
 func EmailEQ(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -631,6 +784,381 @@ func ServiceEQ(v bool) predicate.User {
 func ServiceNEQ(v bool) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldService), v))
+	})
+}
+
+// TeamsIDEQ applies the EQ predicate on the "teams_id" field.
+func TeamsIDEQ(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTeamsID), v))
+	})
+}
+
+// TeamsIDNEQ applies the NEQ predicate on the "teams_id" field.
+func TeamsIDNEQ(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldTeamsID), v))
+	})
+}
+
+// TeamsIDIn applies the In predicate on the "teams_id" field.
+func TeamsIDIn(vs ...string) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldTeamsID), v...))
+	})
+}
+
+// TeamsIDNotIn applies the NotIn predicate on the "teams_id" field.
+func TeamsIDNotIn(vs ...string) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldTeamsID), v...))
+	})
+}
+
+// TeamsIDGT applies the GT predicate on the "teams_id" field.
+func TeamsIDGT(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldTeamsID), v))
+	})
+}
+
+// TeamsIDGTE applies the GTE predicate on the "teams_id" field.
+func TeamsIDGTE(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldTeamsID), v))
+	})
+}
+
+// TeamsIDLT applies the LT predicate on the "teams_id" field.
+func TeamsIDLT(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldTeamsID), v))
+	})
+}
+
+// TeamsIDLTE applies the LTE predicate on the "teams_id" field.
+func TeamsIDLTE(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldTeamsID), v))
+	})
+}
+
+// TeamsIDContains applies the Contains predicate on the "teams_id" field.
+func TeamsIDContains(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldTeamsID), v))
+	})
+}
+
+// TeamsIDHasPrefix applies the HasPrefix predicate on the "teams_id" field.
+func TeamsIDHasPrefix(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldTeamsID), v))
+	})
+}
+
+// TeamsIDHasSuffix applies the HasSuffix predicate on the "teams_id" field.
+func TeamsIDHasSuffix(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldTeamsID), v))
+	})
+}
+
+// TeamsIDIsNil applies the IsNil predicate on the "teams_id" field.
+func TeamsIDIsNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldTeamsID)))
+	})
+}
+
+// TeamsIDNotNil applies the NotNil predicate on the "teams_id" field.
+func TeamsIDNotNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldTeamsID)))
+	})
+}
+
+// TeamsIDEqualFold applies the EqualFold predicate on the "teams_id" field.
+func TeamsIDEqualFold(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldTeamsID), v))
+	})
+}
+
+// TeamsIDContainsFold applies the ContainsFold predicate on the "teams_id" field.
+func TeamsIDContainsFold(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldTeamsID), v))
+	})
+}
+
+// TelegramIDEQ applies the EQ predicate on the "telegram_id" field.
+func TelegramIDEQ(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTelegramID), v))
+	})
+}
+
+// TelegramIDNEQ applies the NEQ predicate on the "telegram_id" field.
+func TelegramIDNEQ(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldTelegramID), v))
+	})
+}
+
+// TelegramIDIn applies the In predicate on the "telegram_id" field.
+func TelegramIDIn(vs ...string) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldTelegramID), v...))
+	})
+}
+
+// TelegramIDNotIn applies the NotIn predicate on the "telegram_id" field.
+func TelegramIDNotIn(vs ...string) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldTelegramID), v...))
+	})
+}
+
+// TelegramIDGT applies the GT predicate on the "telegram_id" field.
+func TelegramIDGT(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldTelegramID), v))
+	})
+}
+
+// TelegramIDGTE applies the GTE predicate on the "telegram_id" field.
+func TelegramIDGTE(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldTelegramID), v))
+	})
+}
+
+// TelegramIDLT applies the LT predicate on the "telegram_id" field.
+func TelegramIDLT(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldTelegramID), v))
+	})
+}
+
+// TelegramIDLTE applies the LTE predicate on the "telegram_id" field.
+func TelegramIDLTE(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldTelegramID), v))
+	})
+}
+
+// TelegramIDContains applies the Contains predicate on the "telegram_id" field.
+func TelegramIDContains(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldTelegramID), v))
+	})
+}
+
+// TelegramIDHasPrefix applies the HasPrefix predicate on the "telegram_id" field.
+func TelegramIDHasPrefix(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldTelegramID), v))
+	})
+}
+
+// TelegramIDHasSuffix applies the HasSuffix predicate on the "telegram_id" field.
+func TelegramIDHasSuffix(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldTelegramID), v))
+	})
+}
+
+// TelegramIDIsNil applies the IsNil predicate on the "telegram_id" field.
+func TelegramIDIsNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldTelegramID)))
+	})
+}
+
+// TelegramIDNotNil applies the NotNil predicate on the "telegram_id" field.
+func TelegramIDNotNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldTelegramID)))
+	})
+}
+
+// TelegramIDEqualFold applies the EqualFold predicate on the "telegram_id" field.
+func TelegramIDEqualFold(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldTelegramID), v))
+	})
+}
+
+// TelegramIDContainsFold applies the ContainsFold predicate on the "telegram_id" field.
+func TelegramIDContainsFold(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldTelegramID), v))
+	})
+}
+
+// SlackIDEQ applies the EQ predicate on the "slack_id" field.
+func SlackIDEQ(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSlackID), v))
+	})
+}
+
+// SlackIDNEQ applies the NEQ predicate on the "slack_id" field.
+func SlackIDNEQ(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldSlackID), v))
+	})
+}
+
+// SlackIDIn applies the In predicate on the "slack_id" field.
+func SlackIDIn(vs ...string) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldSlackID), v...))
+	})
+}
+
+// SlackIDNotIn applies the NotIn predicate on the "slack_id" field.
+func SlackIDNotIn(vs ...string) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldSlackID), v...))
+	})
+}
+
+// SlackIDGT applies the GT predicate on the "slack_id" field.
+func SlackIDGT(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldSlackID), v))
+	})
+}
+
+// SlackIDGTE applies the GTE predicate on the "slack_id" field.
+func SlackIDGTE(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldSlackID), v))
+	})
+}
+
+// SlackIDLT applies the LT predicate on the "slack_id" field.
+func SlackIDLT(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldSlackID), v))
+	})
+}
+
+// SlackIDLTE applies the LTE predicate on the "slack_id" field.
+func SlackIDLTE(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldSlackID), v))
+	})
+}
+
+// SlackIDContains applies the Contains predicate on the "slack_id" field.
+func SlackIDContains(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldSlackID), v))
+	})
+}
+
+// SlackIDHasPrefix applies the HasPrefix predicate on the "slack_id" field.
+func SlackIDHasPrefix(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldSlackID), v))
+	})
+}
+
+// SlackIDHasSuffix applies the HasSuffix predicate on the "slack_id" field.
+func SlackIDHasSuffix(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldSlackID), v))
+	})
+}
+
+// SlackIDIsNil applies the IsNil predicate on the "slack_id" field.
+func SlackIDIsNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldSlackID)))
+	})
+}
+
+// SlackIDNotNil applies the NotNil predicate on the "slack_id" field.
+func SlackIDNotNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldSlackID)))
+	})
+}
+
+// SlackIDEqualFold applies the EqualFold predicate on the "slack_id" field.
+func SlackIDEqualFold(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldSlackID), v))
+	})
+}
+
+// SlackIDContainsFold applies the ContainsFold predicate on the "slack_id" field.
+func SlackIDContainsFold(v string) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldSlackID), v))
 	})
 }
 

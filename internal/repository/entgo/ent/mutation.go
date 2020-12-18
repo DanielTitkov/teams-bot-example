@@ -1167,9 +1167,13 @@ type UserMutation struct {
 	create_time   *time.Time
 	update_time   *time.Time
 	username      *string
+	display_name  *string
 	email         *string
 	password_hash *string
 	service       *bool
+	teams_id      *string
+	telegram_id   *string
+	slack_id      *string
 	clearedFields map[string]struct{}
 	dialog        *int
 	cleareddialog bool
@@ -1367,6 +1371,56 @@ func (m *UserMutation) ResetUsername() {
 	m.username = nil
 }
 
+// SetDisplayName sets the display_name field.
+func (m *UserMutation) SetDisplayName(s string) {
+	m.display_name = &s
+}
+
+// DisplayName returns the display_name value in the mutation.
+func (m *UserMutation) DisplayName() (r string, exists bool) {
+	v := m.display_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDisplayName returns the old display_name value of the User.
+// If the User object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *UserMutation) OldDisplayName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDisplayName is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDisplayName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDisplayName: %w", err)
+	}
+	return oldValue.DisplayName, nil
+}
+
+// ClearDisplayName clears the value of display_name.
+func (m *UserMutation) ClearDisplayName() {
+	m.display_name = nil
+	m.clearedFields[user.FieldDisplayName] = struct{}{}
+}
+
+// DisplayNameCleared returns if the field display_name was cleared in this mutation.
+func (m *UserMutation) DisplayNameCleared() bool {
+	_, ok := m.clearedFields[user.FieldDisplayName]
+	return ok
+}
+
+// ResetDisplayName reset all changes of the "display_name" field.
+func (m *UserMutation) ResetDisplayName() {
+	m.display_name = nil
+	delete(m.clearedFields, user.FieldDisplayName)
+}
+
 // SetEmail sets the email field.
 func (m *UserMutation) SetEmail(s string) {
 	m.email = &s
@@ -1478,6 +1532,156 @@ func (m *UserMutation) ResetService() {
 	m.service = nil
 }
 
+// SetTeamsID sets the teams_id field.
+func (m *UserMutation) SetTeamsID(s string) {
+	m.teams_id = &s
+}
+
+// TeamsID returns the teams_id value in the mutation.
+func (m *UserMutation) TeamsID() (r string, exists bool) {
+	v := m.teams_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTeamsID returns the old teams_id value of the User.
+// If the User object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *UserMutation) OldTeamsID(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldTeamsID is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldTeamsID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTeamsID: %w", err)
+	}
+	return oldValue.TeamsID, nil
+}
+
+// ClearTeamsID clears the value of teams_id.
+func (m *UserMutation) ClearTeamsID() {
+	m.teams_id = nil
+	m.clearedFields[user.FieldTeamsID] = struct{}{}
+}
+
+// TeamsIDCleared returns if the field teams_id was cleared in this mutation.
+func (m *UserMutation) TeamsIDCleared() bool {
+	_, ok := m.clearedFields[user.FieldTeamsID]
+	return ok
+}
+
+// ResetTeamsID reset all changes of the "teams_id" field.
+func (m *UserMutation) ResetTeamsID() {
+	m.teams_id = nil
+	delete(m.clearedFields, user.FieldTeamsID)
+}
+
+// SetTelegramID sets the telegram_id field.
+func (m *UserMutation) SetTelegramID(s string) {
+	m.telegram_id = &s
+}
+
+// TelegramID returns the telegram_id value in the mutation.
+func (m *UserMutation) TelegramID() (r string, exists bool) {
+	v := m.telegram_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTelegramID returns the old telegram_id value of the User.
+// If the User object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *UserMutation) OldTelegramID(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldTelegramID is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldTelegramID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTelegramID: %w", err)
+	}
+	return oldValue.TelegramID, nil
+}
+
+// ClearTelegramID clears the value of telegram_id.
+func (m *UserMutation) ClearTelegramID() {
+	m.telegram_id = nil
+	m.clearedFields[user.FieldTelegramID] = struct{}{}
+}
+
+// TelegramIDCleared returns if the field telegram_id was cleared in this mutation.
+func (m *UserMutation) TelegramIDCleared() bool {
+	_, ok := m.clearedFields[user.FieldTelegramID]
+	return ok
+}
+
+// ResetTelegramID reset all changes of the "telegram_id" field.
+func (m *UserMutation) ResetTelegramID() {
+	m.telegram_id = nil
+	delete(m.clearedFields, user.FieldTelegramID)
+}
+
+// SetSlackID sets the slack_id field.
+func (m *UserMutation) SetSlackID(s string) {
+	m.slack_id = &s
+}
+
+// SlackID returns the slack_id value in the mutation.
+func (m *UserMutation) SlackID() (r string, exists bool) {
+	v := m.slack_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlackID returns the old slack_id value of the User.
+// If the User object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *UserMutation) OldSlackID(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldSlackID is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldSlackID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlackID: %w", err)
+	}
+	return oldValue.SlackID, nil
+}
+
+// ClearSlackID clears the value of slack_id.
+func (m *UserMutation) ClearSlackID() {
+	m.slack_id = nil
+	m.clearedFields[user.FieldSlackID] = struct{}{}
+}
+
+// SlackIDCleared returns if the field slack_id was cleared in this mutation.
+func (m *UserMutation) SlackIDCleared() bool {
+	_, ok := m.clearedFields[user.FieldSlackID]
+	return ok
+}
+
+// ResetSlackID reset all changes of the "slack_id" field.
+func (m *UserMutation) ResetSlackID() {
+	m.slack_id = nil
+	delete(m.clearedFields, user.FieldSlackID)
+}
+
 // SetDialogID sets the dialog edge to Dialog by id.
 func (m *UserMutation) SetDialogID(id int) {
 	m.dialog = &id
@@ -1531,7 +1735,7 @@ func (m *UserMutation) Type() string {
 // this mutation. Note that, in order to get all numeric
 // fields that were in/decremented, call AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 10)
 	if m.create_time != nil {
 		fields = append(fields, user.FieldCreateTime)
 	}
@@ -1541,6 +1745,9 @@ func (m *UserMutation) Fields() []string {
 	if m.username != nil {
 		fields = append(fields, user.FieldUsername)
 	}
+	if m.display_name != nil {
+		fields = append(fields, user.FieldDisplayName)
+	}
 	if m.email != nil {
 		fields = append(fields, user.FieldEmail)
 	}
@@ -1549,6 +1756,15 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.service != nil {
 		fields = append(fields, user.FieldService)
+	}
+	if m.teams_id != nil {
+		fields = append(fields, user.FieldTeamsID)
+	}
+	if m.telegram_id != nil {
+		fields = append(fields, user.FieldTelegramID)
+	}
+	if m.slack_id != nil {
+		fields = append(fields, user.FieldSlackID)
 	}
 	return fields
 }
@@ -1564,12 +1780,20 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdateTime()
 	case user.FieldUsername:
 		return m.Username()
+	case user.FieldDisplayName:
+		return m.DisplayName()
 	case user.FieldEmail:
 		return m.Email()
 	case user.FieldPasswordHash:
 		return m.PasswordHash()
 	case user.FieldService:
 		return m.Service()
+	case user.FieldTeamsID:
+		return m.TeamsID()
+	case user.FieldTelegramID:
+		return m.TelegramID()
+	case user.FieldSlackID:
+		return m.SlackID()
 	}
 	return nil, false
 }
@@ -1585,12 +1809,20 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUpdateTime(ctx)
 	case user.FieldUsername:
 		return m.OldUsername(ctx)
+	case user.FieldDisplayName:
+		return m.OldDisplayName(ctx)
 	case user.FieldEmail:
 		return m.OldEmail(ctx)
 	case user.FieldPasswordHash:
 		return m.OldPasswordHash(ctx)
 	case user.FieldService:
 		return m.OldService(ctx)
+	case user.FieldTeamsID:
+		return m.OldTeamsID(ctx)
+	case user.FieldTelegramID:
+		return m.OldTelegramID(ctx)
+	case user.FieldSlackID:
+		return m.OldSlackID(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -1621,6 +1853,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUsername(v)
 		return nil
+	case user.FieldDisplayName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDisplayName(v)
+		return nil
 	case user.FieldEmail:
 		v, ok := value.(string)
 		if !ok {
@@ -1641,6 +1880,27 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetService(v)
+		return nil
+	case user.FieldTeamsID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTeamsID(v)
+		return nil
+	case user.FieldTelegramID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTelegramID(v)
+		return nil
+	case user.FieldSlackID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlackID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -1671,7 +1931,20 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared
 // during this mutation.
 func (m *UserMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(user.FieldDisplayName) {
+		fields = append(fields, user.FieldDisplayName)
+	}
+	if m.FieldCleared(user.FieldTeamsID) {
+		fields = append(fields, user.FieldTeamsID)
+	}
+	if m.FieldCleared(user.FieldTelegramID) {
+		fields = append(fields, user.FieldTelegramID)
+	}
+	if m.FieldCleared(user.FieldSlackID) {
+		fields = append(fields, user.FieldSlackID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicates if this field was
@@ -1684,6 +1957,20 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value for the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
+	switch name {
+	case user.FieldDisplayName:
+		m.ClearDisplayName()
+		return nil
+	case user.FieldTeamsID:
+		m.ClearTeamsID()
+		return nil
+	case user.FieldTelegramID:
+		m.ClearTelegramID()
+		return nil
+	case user.FieldSlackID:
+		m.ClearSlackID()
+		return nil
+	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 
@@ -1701,6 +1988,9 @@ func (m *UserMutation) ResetField(name string) error {
 	case user.FieldUsername:
 		m.ResetUsername()
 		return nil
+	case user.FieldDisplayName:
+		m.ResetDisplayName()
+		return nil
 	case user.FieldEmail:
 		m.ResetEmail()
 		return nil
@@ -1709,6 +1999,15 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldService:
 		m.ResetService()
+		return nil
+	case user.FieldTeamsID:
+		m.ResetTeamsID()
+		return nil
+	case user.FieldTelegramID:
+		m.ResetTelegramID()
+		return nil
+	case user.FieldSlackID:
+		m.ResetSlackID()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

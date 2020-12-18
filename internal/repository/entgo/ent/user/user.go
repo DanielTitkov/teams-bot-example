@@ -17,12 +17,20 @@ const (
 	FieldUpdateTime = "update_time"
 	// FieldUsername holds the string denoting the username field in the database.
 	FieldUsername = "username"
+	// FieldDisplayName holds the string denoting the display_name field in the database.
+	FieldDisplayName = "display_name"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
 	// FieldPasswordHash holds the string denoting the password_hash field in the database.
 	FieldPasswordHash = "password_hash"
 	// FieldService holds the string denoting the service field in the database.
 	FieldService = "service"
+	// FieldTeamsID holds the string denoting the teams_id field in the database.
+	FieldTeamsID = "teams_id"
+	// FieldTelegramID holds the string denoting the telegram_id field in the database.
+	FieldTelegramID = "telegram_id"
+	// FieldSlackID holds the string denoting the slack_id field in the database.
+	FieldSlackID = "slack_id"
 
 	// EdgeDialog holds the string denoting the dialog edge name in mutations.
 	EdgeDialog = "dialog"
@@ -44,9 +52,13 @@ var Columns = []string{
 	FieldCreateTime,
 	FieldUpdateTime,
 	FieldUsername,
+	FieldDisplayName,
 	FieldEmail,
 	FieldPasswordHash,
 	FieldService,
+	FieldTeamsID,
+	FieldTelegramID,
+	FieldSlackID,
 }
 
 var (

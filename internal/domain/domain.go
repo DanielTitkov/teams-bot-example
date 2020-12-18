@@ -8,6 +8,7 @@ type (
 		ID           int  // id is passed to domain model for simplicity
 		Service      bool // if user is a service
 		Username     string
+		DisplayName  string // human readable name
 		Password     string
 		PasswordHash string
 		Email        string   // TODO: add ent validation
@@ -29,8 +30,8 @@ type (
 	}
 	// UserMessagerData stores users data for a specific messager
 	UserMessagerData struct {
-		ID       string
-		Username string
+		ID       *string
+		Username *string
 	}
 	// Dialog holds dialog reference in different messagers
 	Dialog struct {

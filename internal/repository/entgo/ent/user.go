@@ -23,12 +23,20 @@ type User struct {
 	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Username holds the value of the "username" field.
 	Username string `json:"username,omitempty"`
+	// DisplayName holds the value of the "display_name" field.
+	DisplayName string `json:"display_name,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
 	// PasswordHash holds the value of the "password_hash" field.
 	PasswordHash string `json:"password_hash,omitempty"`
 	// Service holds the value of the "service" field.
 	Service bool `json:"service,omitempty"`
+	// TeamsID holds the value of the "teams_id" field.
+	TeamsID *string `json:"teams_id,omitempty"`
+	// TelegramID holds the value of the "telegram_id" field.
+	TelegramID *string `json:"telegram_id,omitempty"`
+	// SlackID holds the value of the "slack_id" field.
+	SlackID *string `json:"slack_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges UserEdges `json:"edges"`
@@ -64,9 +72,13 @@ func (*User) scanValues() []interface{} {
 		&sql.NullTime{},   // create_time
 		&sql.NullTime{},   // update_time
 		&sql.NullString{}, // username
+		&sql.NullString{}, // display_name
 		&sql.NullString{}, // email
 		&sql.NullString{}, // password_hash
 		&sql.NullBool{},   // service
+		&sql.NullString{}, // teams_id
+		&sql.NullString{}, // telegram_id
+		&sql.NullString{}, // slack_id
 	}
 }
 
@@ -98,19 +110,42 @@ func (u *User) assignValues(values ...interface{}) error {
 		u.Username = value.String
 	}
 	if value, ok := values[3].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field email", values[3])
+		return fmt.Errorf("unexpected type %T for field display_name", values[3])
+	} else if value.Valid {
+		u.DisplayName = value.String
+	}
+	if value, ok := values[4].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field email", values[4])
 	} else if value.Valid {
 		u.Email = value.String
 	}
-	if value, ok := values[4].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field password_hash", values[4])
+	if value, ok := values[5].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field password_hash", values[5])
 	} else if value.Valid {
 		u.PasswordHash = value.String
 	}
-	if value, ok := values[5].(*sql.NullBool); !ok {
-		return fmt.Errorf("unexpected type %T for field service", values[5])
+	if value, ok := values[6].(*sql.NullBool); !ok {
+		return fmt.Errorf("unexpected type %T for field service", values[6])
 	} else if value.Valid {
 		u.Service = value.Bool
+	}
+	if value, ok := values[7].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field teams_id", values[7])
+	} else if value.Valid {
+		u.TeamsID = new(string)
+		*u.TeamsID = value.String
+	}
+	if value, ok := values[8].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field telegram_id", values[8])
+	} else if value.Valid {
+		u.TelegramID = new(string)
+		*u.TelegramID = value.String
+	}
+	if value, ok := values[9].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field slack_id", values[9])
+	} else if value.Valid {
+		u.SlackID = new(string)
+		*u.SlackID = value.String
 	}
 	return nil
 }
@@ -149,12 +184,26 @@ func (u *User) String() string {
 	builder.WriteString(u.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", username=")
 	builder.WriteString(u.Username)
+	builder.WriteString(", display_name=")
+	builder.WriteString(u.DisplayName)
 	builder.WriteString(", email=")
 	builder.WriteString(u.Email)
 	builder.WriteString(", password_hash=")
 	builder.WriteString(u.PasswordHash)
 	builder.WriteString(", service=")
 	builder.WriteString(fmt.Sprintf("%v", u.Service))
+	if v := u.TeamsID; v != nil {
+		builder.WriteString(", teams_id=")
+		builder.WriteString(*v)
+	}
+	if v := u.TelegramID; v != nil {
+		builder.WriteString(", telegram_id=")
+		builder.WriteString(*v)
+	}
+	if v := u.SlackID; v != nil {
+		builder.WriteString(", slack_id=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

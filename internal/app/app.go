@@ -16,6 +16,7 @@ type (
 		// users
 		CreateUser(*domain.User) (*domain.User, error)
 		GetUserByUsername(username string) (*domain.User, error)
+		GetUserByTeamsID(teamsID string) (*domain.User, error)
 		GetUserCount() (int, error)
 
 		// messages

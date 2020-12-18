@@ -61,7 +61,7 @@ func main() {
 				},
 				Attachment: string(cardJSON),
 			}
-			time.Sleep(5 * time.Second)
+			time.Sleep(50000 * time.Second)
 			proactiveChannel <- m
 			fmt.Println("PROACTIVE PUSHED")
 		}

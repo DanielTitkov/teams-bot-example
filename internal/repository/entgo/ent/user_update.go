@@ -34,6 +34,26 @@ func (uu *UserUpdate) SetUsername(s string) *UserUpdate {
 	return uu
 }
 
+// SetDisplayName sets the display_name field.
+func (uu *UserUpdate) SetDisplayName(s string) *UserUpdate {
+	uu.mutation.SetDisplayName(s)
+	return uu
+}
+
+// SetNillableDisplayName sets the display_name field if the given value is not nil.
+func (uu *UserUpdate) SetNillableDisplayName(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetDisplayName(*s)
+	}
+	return uu
+}
+
+// ClearDisplayName clears the value of display_name.
+func (uu *UserUpdate) ClearDisplayName() *UserUpdate {
+	uu.mutation.ClearDisplayName()
+	return uu
+}
+
 // SetEmail sets the email field.
 func (uu *UserUpdate) SetEmail(s string) *UserUpdate {
 	uu.mutation.SetEmail(s)
@@ -57,6 +77,66 @@ func (uu *UserUpdate) SetNillableService(b *bool) *UserUpdate {
 	if b != nil {
 		uu.SetService(*b)
 	}
+	return uu
+}
+
+// SetTeamsID sets the teams_id field.
+func (uu *UserUpdate) SetTeamsID(s string) *UserUpdate {
+	uu.mutation.SetTeamsID(s)
+	return uu
+}
+
+// SetNillableTeamsID sets the teams_id field if the given value is not nil.
+func (uu *UserUpdate) SetNillableTeamsID(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetTeamsID(*s)
+	}
+	return uu
+}
+
+// ClearTeamsID clears the value of teams_id.
+func (uu *UserUpdate) ClearTeamsID() *UserUpdate {
+	uu.mutation.ClearTeamsID()
+	return uu
+}
+
+// SetTelegramID sets the telegram_id field.
+func (uu *UserUpdate) SetTelegramID(s string) *UserUpdate {
+	uu.mutation.SetTelegramID(s)
+	return uu
+}
+
+// SetNillableTelegramID sets the telegram_id field if the given value is not nil.
+func (uu *UserUpdate) SetNillableTelegramID(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetTelegramID(*s)
+	}
+	return uu
+}
+
+// ClearTelegramID clears the value of telegram_id.
+func (uu *UserUpdate) ClearTelegramID() *UserUpdate {
+	uu.mutation.ClearTelegramID()
+	return uu
+}
+
+// SetSlackID sets the slack_id field.
+func (uu *UserUpdate) SetSlackID(s string) *UserUpdate {
+	uu.mutation.SetSlackID(s)
+	return uu
+}
+
+// SetNillableSlackID sets the slack_id field if the given value is not nil.
+func (uu *UserUpdate) SetNillableSlackID(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetSlackID(*s)
+	}
+	return uu
+}
+
+// ClearSlackID clears the value of slack_id.
+func (uu *UserUpdate) ClearSlackID() *UserUpdate {
+	uu.mutation.ClearSlackID()
 	return uu
 }
 
@@ -188,6 +268,19 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldUsername,
 		})
 	}
+	if value, ok := uu.mutation.DisplayName(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldDisplayName,
+		})
+	}
+	if uu.mutation.DisplayNameCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: user.FieldDisplayName,
+		})
+	}
 	if value, ok := uu.mutation.Email(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -207,6 +300,45 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: user.FieldService,
+		})
+	}
+	if value, ok := uu.mutation.TeamsID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldTeamsID,
+		})
+	}
+	if uu.mutation.TeamsIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: user.FieldTeamsID,
+		})
+	}
+	if value, ok := uu.mutation.TelegramID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldTelegramID,
+		})
+	}
+	if uu.mutation.TelegramIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: user.FieldTelegramID,
+		})
+	}
+	if value, ok := uu.mutation.SlackID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldSlackID,
+		})
+	}
+	if uu.mutation.SlackIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: user.FieldSlackID,
 		})
 	}
 	if uu.mutation.DialogCleared() {
@@ -268,6 +400,26 @@ func (uuo *UserUpdateOne) SetUsername(s string) *UserUpdateOne {
 	return uuo
 }
 
+// SetDisplayName sets the display_name field.
+func (uuo *UserUpdateOne) SetDisplayName(s string) *UserUpdateOne {
+	uuo.mutation.SetDisplayName(s)
+	return uuo
+}
+
+// SetNillableDisplayName sets the display_name field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableDisplayName(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetDisplayName(*s)
+	}
+	return uuo
+}
+
+// ClearDisplayName clears the value of display_name.
+func (uuo *UserUpdateOne) ClearDisplayName() *UserUpdateOne {
+	uuo.mutation.ClearDisplayName()
+	return uuo
+}
+
 // SetEmail sets the email field.
 func (uuo *UserUpdateOne) SetEmail(s string) *UserUpdateOne {
 	uuo.mutation.SetEmail(s)
@@ -291,6 +443,66 @@ func (uuo *UserUpdateOne) SetNillableService(b *bool) *UserUpdateOne {
 	if b != nil {
 		uuo.SetService(*b)
 	}
+	return uuo
+}
+
+// SetTeamsID sets the teams_id field.
+func (uuo *UserUpdateOne) SetTeamsID(s string) *UserUpdateOne {
+	uuo.mutation.SetTeamsID(s)
+	return uuo
+}
+
+// SetNillableTeamsID sets the teams_id field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableTeamsID(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetTeamsID(*s)
+	}
+	return uuo
+}
+
+// ClearTeamsID clears the value of teams_id.
+func (uuo *UserUpdateOne) ClearTeamsID() *UserUpdateOne {
+	uuo.mutation.ClearTeamsID()
+	return uuo
+}
+
+// SetTelegramID sets the telegram_id field.
+func (uuo *UserUpdateOne) SetTelegramID(s string) *UserUpdateOne {
+	uuo.mutation.SetTelegramID(s)
+	return uuo
+}
+
+// SetNillableTelegramID sets the telegram_id field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableTelegramID(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetTelegramID(*s)
+	}
+	return uuo
+}
+
+// ClearTelegramID clears the value of telegram_id.
+func (uuo *UserUpdateOne) ClearTelegramID() *UserUpdateOne {
+	uuo.mutation.ClearTelegramID()
+	return uuo
+}
+
+// SetSlackID sets the slack_id field.
+func (uuo *UserUpdateOne) SetSlackID(s string) *UserUpdateOne {
+	uuo.mutation.SetSlackID(s)
+	return uuo
+}
+
+// SetNillableSlackID sets the slack_id field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableSlackID(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetSlackID(*s)
+	}
+	return uuo
+}
+
+// ClearSlackID clears the value of slack_id.
+func (uuo *UserUpdateOne) ClearSlackID() *UserUpdateOne {
+	uuo.mutation.ClearSlackID()
 	return uuo
 }
 
@@ -420,6 +632,19 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (u *User, err error) {
 			Column: user.FieldUsername,
 		})
 	}
+	if value, ok := uuo.mutation.DisplayName(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldDisplayName,
+		})
+	}
+	if uuo.mutation.DisplayNameCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: user.FieldDisplayName,
+		})
+	}
 	if value, ok := uuo.mutation.Email(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -439,6 +664,45 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (u *User, err error) {
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: user.FieldService,
+		})
+	}
+	if value, ok := uuo.mutation.TeamsID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldTeamsID,
+		})
+	}
+	if uuo.mutation.TeamsIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: user.FieldTeamsID,
+		})
+	}
+	if value, ok := uuo.mutation.TelegramID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldTelegramID,
+		})
+	}
+	if uuo.mutation.TelegramIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: user.FieldTelegramID,
+		})
+	}
+	if value, ok := uuo.mutation.SlackID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldSlackID,
+		})
+	}
+	if uuo.mutation.SlackIDCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: user.FieldSlackID,
 		})
 	}
 	if uuo.mutation.DialogCleared() {
