@@ -55,8 +55,10 @@ func main() {
 	go func() {
 		for {
 			m := domain.Message{
-				Text:       "Proactive text",
-				DialogData: dialogData,
+				Text: "Proactive text",
+				Dialog: domain.DialogMeta{
+					Teams: dialogData,
+				},
 				Attachment: string(cardJSON),
 			}
 			time.Sleep(5 * time.Second)

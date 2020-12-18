@@ -10,13 +10,27 @@ type (
 		Username     string
 		Password     string
 		PasswordHash string
-		Email        string // TODO: add ent validation
+		Email        string   // TODO: add ent validation
+		Meta         UserMeta // stores messagers ids
 	}
 	// Message is used for messagers
 	Message struct {
 		Text       string
-		DialogData string
 		Attachment string
+		Dialog     DialogMeta // used for callbacks, not stored
+		User       UserMeta
+		Err        error
+	}
+	// UserMeta stores users data for messagers
+	UserMeta struct {
+		Teams    UserMessagerData
+		Telegram UserMessagerData
+		Slack    UserMessagerData
+	}
+	// UserMessagerData stores users data for a specific messager
+	UserMessagerData struct {
+		ID       string
+		Username string
 	}
 	// Dialog holds dialog reference in different messagers
 	Dialog struct {
@@ -24,7 +38,7 @@ type (
 		User string // username
 		Meta DialogMeta
 	}
-	// DialogMeta for messagers
+	// DialogMeta stores serialize dialog reference for messagers
 	DialogMeta struct {
 		Teams    string
 		Telegram string // for example

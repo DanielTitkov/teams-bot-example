@@ -69,17 +69,15 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 
 	var handler = activity.HandlerFuncs{
 		OnMessageFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
-			response := t.onMessageHandler(domain.Message{
-				Text: turn.Activity.Text,
-			})
+			response := t.onMessageHandler(t.activityToMessage(turn))
 			return turn.SendActivity(activity.MsgOptionText(response.Text))
 		},
 		OnInvokeFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
-			response := t.onInvokeHandler(domain.Message{})
+			response := t.onInvokeHandler(t.activityToMessage(turn))
 			return turn.SendActivity(activity.MsgOptionText(response.Text))
 		},
 		OnConversationUpdateFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
-			response := t.onUpdateHandler(domain.Message{})
+			response := t.onUpdateHandler(t.activityToMessage(turn))
 			return turn.SendActivity(activity.MsgOptionText(response.Text))
 		},
 	}
@@ -90,12 +88,6 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	// Set conversation reference
-	// TODO: probably move this to handler and pass to app
-	var conversationRef schema.ConversationReference
-	conversationRef = activity.GetCoversationReference(act)
-	fmt.Printf("REF %+v\n", conversationRef) // TODO store somewhere ref
 
 	err = t.adapter.ProcessActivity(ctx, act, handler)
 	if err != nil {
@@ -140,7 +132,7 @@ func (t *Teams) RunProactiveManager() {
 
 func (t *Teams) sendMessage(message domain.Message) {
 	var ref schema.ConversationReference
-	err := json.Unmarshal([]byte(message.DialogData), &ref)
+	err := json.Unmarshal([]byte(message.Dialog.Teams), &ref)
 	if err != nil {
 		t.logger.Error("Failed to unmarshal conversation reference", err)
 		return
@@ -169,4 +161,22 @@ func (t *Teams) sendMessage(message domain.Message) {
 		return
 	}
 	t.logger.Info("Proactive message sent successfully.", fmt.Sprintf("%+v", message))
+}
+
+func (t *Teams) activityToMessage(turn *activity.TurnContext) domain.Message {
+	conversationRef := activity.GetCoversationReference(turn.Activity)
+	jsonRef, err := json.Marshal(conversationRef)
+	return domain.Message{
+		Text: turn.Activity.Text,
+		Dialog: domain.DialogMeta{
+			Teams: string(jsonRef),
+		},
+		User: domain.UserMeta{
+			Teams: domain.UserMessagerData{
+				ID:       conversationRef.User.ID,
+				Username: conversationRef.User.Name,
+			},
+		},
+		Err: err,
+	}
 }
