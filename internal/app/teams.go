@@ -32,13 +32,13 @@ func (a *App) HandleMessage(message domain.Message) domain.Message {
 			a.logger.Error("failed to create user", err)
 		} else {
 			a.logger.Info("user created", fmt.Sprint(user))
+			// TODO: add proacitve - user created
 		}
-		// TODO: add proacitve - user created
 	} else {
 		a.logger.Info("user fetched", fmt.Sprint(user))
 	}
 
-	message.Text = "Echo: " + message.Text
+	message.Text = "Echo for user " + user.DisplayName + ": " + message.Text
 	return message
 }
 
