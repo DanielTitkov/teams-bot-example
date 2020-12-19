@@ -37,8 +37,8 @@ func (r *EntgoRepository) GetUserDialog(u *domain.User) (*domain.Dialog, error) 
 
 func (r *EntgoRepository) entToDomainDialog(d *ent.Dialog) *domain.Dialog {
 	return &domain.Dialog{
-		ID:   d.ID,
-		User: d.Edges.User.Username, // FIXME probably this won't fetch on create
+		ID: d.ID,
+		// User: d.Edges.User.Username, // FIXME probably this won't fetch on create
 		Meta: domain.DialogMeta{
 			Teams:    d.Meta.Teams,
 			Telegram: d.Meta.Telegram,

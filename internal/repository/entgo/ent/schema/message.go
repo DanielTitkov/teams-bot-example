@@ -17,6 +17,9 @@ func (Message) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("text").Optional(),
 		field.String("attachment").Optional(),
+		field.String("system"),
+		field.String("direction"),
+		field.Bool("proactive"),
 	}
 }
 

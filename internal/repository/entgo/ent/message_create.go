@@ -77,6 +77,24 @@ func (mc *MessageCreate) SetNillableAttachment(s *string) *MessageCreate {
 	return mc
 }
 
+// SetSystem sets the system field.
+func (mc *MessageCreate) SetSystem(s string) *MessageCreate {
+	mc.mutation.SetSystem(s)
+	return mc
+}
+
+// SetDirection sets the direction field.
+func (mc *MessageCreate) SetDirection(s string) *MessageCreate {
+	mc.mutation.SetDirection(s)
+	return mc
+}
+
+// SetProactive sets the proactive field.
+func (mc *MessageCreate) SetProactive(b bool) *MessageCreate {
+	mc.mutation.SetProactive(b)
+	return mc
+}
+
 // SetDialogID sets the dialog edge to Dialog by id.
 func (mc *MessageCreate) SetDialogID(id int) *MessageCreate {
 	mc.mutation.SetDialogID(id)
@@ -143,6 +161,15 @@ func (mc *MessageCreate) preSave() error {
 		v := message.DefaultUpdateTime()
 		mc.mutation.SetUpdateTime(v)
 	}
+	if _, ok := mc.mutation.System(); !ok {
+		return &ValidationError{Name: "system", err: errors.New("ent: missing required field \"system\"")}
+	}
+	if _, ok := mc.mutation.Direction(); !ok {
+		return &ValidationError{Name: "direction", err: errors.New("ent: missing required field \"direction\"")}
+	}
+	if _, ok := mc.mutation.Proactive(); !ok {
+		return &ValidationError{Name: "proactive", err: errors.New("ent: missing required field \"proactive\"")}
+	}
 	if _, ok := mc.mutation.DialogID(); !ok {
 		return &ValidationError{Name: "dialog", err: errors.New("ent: missing required edge \"dialog\"")}
 	}
@@ -204,6 +231,30 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 			Column: message.FieldAttachment,
 		})
 		m.Attachment = value
+	}
+	if value, ok := mc.mutation.System(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldSystem,
+		})
+		m.System = value
+	}
+	if value, ok := mc.mutation.Direction(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldDirection,
+		})
+		m.Direction = value
+	}
+	if value, ok := mc.mutation.Proactive(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: message.FieldProactive,
+		})
+		m.Proactive = value
 	}
 	if nodes := mc.mutation.DialogIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

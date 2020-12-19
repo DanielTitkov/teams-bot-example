@@ -6,6 +6,11 @@ import (
 	"github.com/DanielTitkov/teams-bot-example/internal/logger"
 )
 
+const (
+	TeamsSystemCode  = "teams"
+	InputMessageCode = "input"
+)
+
 type (
 	App struct {
 		cfg    configs.Config
@@ -20,7 +25,7 @@ type (
 		GetUserCount() (int, error)
 
 		// messages
-		// CreateMessage(*domain.Message) (*domain.Message, error)
+		CreateMessage(m *domain.Message, d *domain.Dialog) (*domain.Message, error)
 
 		// dialog
 		CreateDialog(*domain.User, *domain.Dialog) (*domain.Dialog, error)

@@ -19,6 +19,12 @@ const (
 	FieldText = "text"
 	// FieldAttachment holds the string denoting the attachment field in the database.
 	FieldAttachment = "attachment"
+	// FieldSystem holds the string denoting the system field in the database.
+	FieldSystem = "system"
+	// FieldDirection holds the string denoting the direction field in the database.
+	FieldDirection = "direction"
+	// FieldProactive holds the string denoting the proactive field in the database.
+	FieldProactive = "proactive"
 
 	// EdgeDialog holds the string denoting the dialog edge name in mutations.
 	EdgeDialog = "dialog"
@@ -41,6 +47,9 @@ var Columns = []string{
 	FieldUpdateTime,
 	FieldText,
 	FieldAttachment,
+	FieldSystem,
+	FieldDirection,
+	FieldProactive,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the Message type.

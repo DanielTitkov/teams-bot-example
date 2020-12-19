@@ -121,6 +121,27 @@ func Attachment(v string) predicate.Message {
 	})
 }
 
+// System applies equality check predicate on the "system" field. It's identical to SystemEQ.
+func System(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSystem), v))
+	})
+}
+
+// Direction applies equality check predicate on the "direction" field. It's identical to DirectionEQ.
+func Direction(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDirection), v))
+	})
+}
+
+// Proactive applies equality check predicate on the "proactive" field. It's identical to ProactiveEQ.
+func Proactive(v bool) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldProactive), v))
+	})
+}
+
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.
 func CreateTimeEQ(v time.Time) predicate.Message {
 	return predicate.Message(func(s *sql.Selector) {
@@ -520,6 +541,242 @@ func AttachmentEqualFold(v string) predicate.Message {
 func AttachmentContainsFold(v string) predicate.Message {
 	return predicate.Message(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldAttachment), v))
+	})
+}
+
+// SystemEQ applies the EQ predicate on the "system" field.
+func SystemEQ(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSystem), v))
+	})
+}
+
+// SystemNEQ applies the NEQ predicate on the "system" field.
+func SystemNEQ(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldSystem), v))
+	})
+}
+
+// SystemIn applies the In predicate on the "system" field.
+func SystemIn(vs ...string) predicate.Message {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Message(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldSystem), v...))
+	})
+}
+
+// SystemNotIn applies the NotIn predicate on the "system" field.
+func SystemNotIn(vs ...string) predicate.Message {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Message(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldSystem), v...))
+	})
+}
+
+// SystemGT applies the GT predicate on the "system" field.
+func SystemGT(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldSystem), v))
+	})
+}
+
+// SystemGTE applies the GTE predicate on the "system" field.
+func SystemGTE(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldSystem), v))
+	})
+}
+
+// SystemLT applies the LT predicate on the "system" field.
+func SystemLT(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldSystem), v))
+	})
+}
+
+// SystemLTE applies the LTE predicate on the "system" field.
+func SystemLTE(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldSystem), v))
+	})
+}
+
+// SystemContains applies the Contains predicate on the "system" field.
+func SystemContains(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldSystem), v))
+	})
+}
+
+// SystemHasPrefix applies the HasPrefix predicate on the "system" field.
+func SystemHasPrefix(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldSystem), v))
+	})
+}
+
+// SystemHasSuffix applies the HasSuffix predicate on the "system" field.
+func SystemHasSuffix(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldSystem), v))
+	})
+}
+
+// SystemEqualFold applies the EqualFold predicate on the "system" field.
+func SystemEqualFold(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldSystem), v))
+	})
+}
+
+// SystemContainsFold applies the ContainsFold predicate on the "system" field.
+func SystemContainsFold(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldSystem), v))
+	})
+}
+
+// DirectionEQ applies the EQ predicate on the "direction" field.
+func DirectionEQ(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDirection), v))
+	})
+}
+
+// DirectionNEQ applies the NEQ predicate on the "direction" field.
+func DirectionNEQ(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldDirection), v))
+	})
+}
+
+// DirectionIn applies the In predicate on the "direction" field.
+func DirectionIn(vs ...string) predicate.Message {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Message(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldDirection), v...))
+	})
+}
+
+// DirectionNotIn applies the NotIn predicate on the "direction" field.
+func DirectionNotIn(vs ...string) predicate.Message {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Message(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldDirection), v...))
+	})
+}
+
+// DirectionGT applies the GT predicate on the "direction" field.
+func DirectionGT(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldDirection), v))
+	})
+}
+
+// DirectionGTE applies the GTE predicate on the "direction" field.
+func DirectionGTE(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldDirection), v))
+	})
+}
+
+// DirectionLT applies the LT predicate on the "direction" field.
+func DirectionLT(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldDirection), v))
+	})
+}
+
+// DirectionLTE applies the LTE predicate on the "direction" field.
+func DirectionLTE(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldDirection), v))
+	})
+}
+
+// DirectionContains applies the Contains predicate on the "direction" field.
+func DirectionContains(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldDirection), v))
+	})
+}
+
+// DirectionHasPrefix applies the HasPrefix predicate on the "direction" field.
+func DirectionHasPrefix(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldDirection), v))
+	})
+}
+
+// DirectionHasSuffix applies the HasSuffix predicate on the "direction" field.
+func DirectionHasSuffix(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldDirection), v))
+	})
+}
+
+// DirectionEqualFold applies the EqualFold predicate on the "direction" field.
+func DirectionEqualFold(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldDirection), v))
+	})
+}
+
+// DirectionContainsFold applies the ContainsFold predicate on the "direction" field.
+func DirectionContainsFold(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldDirection), v))
+	})
+}
+
+// ProactiveEQ applies the EQ predicate on the "proactive" field.
+func ProactiveEQ(v bool) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldProactive), v))
+	})
+}
+
+// ProactiveNEQ applies the NEQ predicate on the "proactive" field.
+func ProactiveNEQ(v bool) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldProactive), v))
 	})
 }
 

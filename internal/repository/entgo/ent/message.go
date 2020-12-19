@@ -25,6 +25,12 @@ type Message struct {
 	Text string `json:"text,omitempty"`
 	// Attachment holds the value of the "attachment" field.
 	Attachment string `json:"attachment,omitempty"`
+	// System holds the value of the "system" field.
+	System string `json:"system,omitempty"`
+	// Direction holds the value of the "direction" field.
+	Direction string `json:"direction,omitempty"`
+	// Proactive holds the value of the "proactive" field.
+	Proactive bool `json:"proactive,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MessageQuery when eager-loading is set.
 	Edges          MessageEdges `json:"edges"`
@@ -62,6 +68,9 @@ func (*Message) scanValues() []interface{} {
 		&sql.NullTime{},   // update_time
 		&sql.NullString{}, // text
 		&sql.NullString{}, // attachment
+		&sql.NullString{}, // system
+		&sql.NullString{}, // direction
+		&sql.NullBool{},   // proactive
 	}
 }
 
@@ -104,7 +113,22 @@ func (m *Message) assignValues(values ...interface{}) error {
 	} else if value.Valid {
 		m.Attachment = value.String
 	}
-	values = values[4:]
+	if value, ok := values[4].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field system", values[4])
+	} else if value.Valid {
+		m.System = value.String
+	}
+	if value, ok := values[5].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field direction", values[5])
+	} else if value.Valid {
+		m.Direction = value.String
+	}
+	if value, ok := values[6].(*sql.NullBool); !ok {
+		return fmt.Errorf("unexpected type %T for field proactive", values[6])
+	} else if value.Valid {
+		m.Proactive = value.Bool
+	}
+	values = values[7:]
 	if len(values) == len(message.ForeignKeys) {
 		if value, ok := values[0].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field dialog_message", value)
@@ -152,6 +176,12 @@ func (m *Message) String() string {
 	builder.WriteString(m.Text)
 	builder.WriteString(", attachment=")
 	builder.WriteString(m.Attachment)
+	builder.WriteString(", system=")
+	builder.WriteString(m.System)
+	builder.WriteString(", direction=")
+	builder.WriteString(m.Direction)
+	builder.WriteString(", proactive=")
+	builder.WriteString(fmt.Sprintf("%v", m.Proactive))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -69,6 +69,24 @@ func (mu *MessageUpdate) ClearAttachment() *MessageUpdate {
 	return mu
 }
 
+// SetSystem sets the system field.
+func (mu *MessageUpdate) SetSystem(s string) *MessageUpdate {
+	mu.mutation.SetSystem(s)
+	return mu
+}
+
+// SetDirection sets the direction field.
+func (mu *MessageUpdate) SetDirection(s string) *MessageUpdate {
+	mu.mutation.SetDirection(s)
+	return mu
+}
+
+// SetProactive sets the proactive field.
+func (mu *MessageUpdate) SetProactive(b bool) *MessageUpdate {
+	mu.mutation.SetProactive(b)
+	return mu
+}
+
 // SetDialogID sets the dialog edge to Dialog by id.
 func (mu *MessageUpdate) SetDialogID(id int) *MessageUpdate {
 	mu.mutation.SetDialogID(id)
@@ -201,6 +219,27 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: message.FieldAttachment,
 		})
 	}
+	if value, ok := mu.mutation.System(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldSystem,
+		})
+	}
+	if value, ok := mu.mutation.Direction(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldDirection,
+		})
+	}
+	if value, ok := mu.mutation.Proactive(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: message.FieldProactive,
+		})
+	}
 	if mu.mutation.DialogCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -291,6 +330,24 @@ func (muo *MessageUpdateOne) SetNillableAttachment(s *string) *MessageUpdateOne 
 // ClearAttachment clears the value of attachment.
 func (muo *MessageUpdateOne) ClearAttachment() *MessageUpdateOne {
 	muo.mutation.ClearAttachment()
+	return muo
+}
+
+// SetSystem sets the system field.
+func (muo *MessageUpdateOne) SetSystem(s string) *MessageUpdateOne {
+	muo.mutation.SetSystem(s)
+	return muo
+}
+
+// SetDirection sets the direction field.
+func (muo *MessageUpdateOne) SetDirection(s string) *MessageUpdateOne {
+	muo.mutation.SetDirection(s)
+	return muo
+}
+
+// SetProactive sets the proactive field.
+func (muo *MessageUpdateOne) SetProactive(b bool) *MessageUpdateOne {
+	muo.mutation.SetProactive(b)
 	return muo
 }
 
@@ -422,6 +479,27 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (m *Message, err error
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: message.FieldAttachment,
+		})
+	}
+	if value, ok := muo.mutation.System(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldSystem,
+		})
+	}
+	if value, ok := muo.mutation.Direction(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldDirection,
+		})
+	}
+	if value, ok := muo.mutation.Proactive(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: message.FieldProactive,
 		})
 	}
 	if muo.mutation.DialogCleared() {

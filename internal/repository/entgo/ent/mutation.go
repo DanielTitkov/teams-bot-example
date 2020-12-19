@@ -600,6 +600,9 @@ type MessageMutation struct {
 	update_time   *time.Time
 	text          *string
 	attachment    *string
+	system        *string
+	direction     *string
+	proactive     *bool
 	clearedFields map[string]struct{}
 	dialog        *int
 	cleareddialog bool
@@ -860,6 +863,117 @@ func (m *MessageMutation) ResetAttachment() {
 	delete(m.clearedFields, message.FieldAttachment)
 }
 
+// SetSystem sets the system field.
+func (m *MessageMutation) SetSystem(s string) {
+	m.system = &s
+}
+
+// System returns the system value in the mutation.
+func (m *MessageMutation) System() (r string, exists bool) {
+	v := m.system
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSystem returns the old system value of the Message.
+// If the Message object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *MessageMutation) OldSystem(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldSystem is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldSystem requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSystem: %w", err)
+	}
+	return oldValue.System, nil
+}
+
+// ResetSystem reset all changes of the "system" field.
+func (m *MessageMutation) ResetSystem() {
+	m.system = nil
+}
+
+// SetDirection sets the direction field.
+func (m *MessageMutation) SetDirection(s string) {
+	m.direction = &s
+}
+
+// Direction returns the direction value in the mutation.
+func (m *MessageMutation) Direction() (r string, exists bool) {
+	v := m.direction
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDirection returns the old direction value of the Message.
+// If the Message object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *MessageMutation) OldDirection(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDirection is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDirection requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDirection: %w", err)
+	}
+	return oldValue.Direction, nil
+}
+
+// ResetDirection reset all changes of the "direction" field.
+func (m *MessageMutation) ResetDirection() {
+	m.direction = nil
+}
+
+// SetProactive sets the proactive field.
+func (m *MessageMutation) SetProactive(b bool) {
+	m.proactive = &b
+}
+
+// Proactive returns the proactive value in the mutation.
+func (m *MessageMutation) Proactive() (r bool, exists bool) {
+	v := m.proactive
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProactive returns the old proactive value of the Message.
+// If the Message object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *MessageMutation) OldProactive(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldProactive is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldProactive requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProactive: %w", err)
+	}
+	return oldValue.Proactive, nil
+}
+
+// ResetProactive reset all changes of the "proactive" field.
+func (m *MessageMutation) ResetProactive() {
+	m.proactive = nil
+}
+
 // SetDialogID sets the dialog edge to Dialog by id.
 func (m *MessageMutation) SetDialogID(id int) {
 	m.dialog = &id
@@ -913,7 +1027,7 @@ func (m *MessageMutation) Type() string {
 // this mutation. Note that, in order to get all numeric
 // fields that were in/decremented, call AddedFields().
 func (m *MessageMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 7)
 	if m.create_time != nil {
 		fields = append(fields, message.FieldCreateTime)
 	}
@@ -925,6 +1039,15 @@ func (m *MessageMutation) Fields() []string {
 	}
 	if m.attachment != nil {
 		fields = append(fields, message.FieldAttachment)
+	}
+	if m.system != nil {
+		fields = append(fields, message.FieldSystem)
+	}
+	if m.direction != nil {
+		fields = append(fields, message.FieldDirection)
+	}
+	if m.proactive != nil {
+		fields = append(fields, message.FieldProactive)
 	}
 	return fields
 }
@@ -942,6 +1065,12 @@ func (m *MessageMutation) Field(name string) (ent.Value, bool) {
 		return m.Text()
 	case message.FieldAttachment:
 		return m.Attachment()
+	case message.FieldSystem:
+		return m.System()
+	case message.FieldDirection:
+		return m.Direction()
+	case message.FieldProactive:
+		return m.Proactive()
 	}
 	return nil, false
 }
@@ -959,6 +1088,12 @@ func (m *MessageMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldText(ctx)
 	case message.FieldAttachment:
 		return m.OldAttachment(ctx)
+	case message.FieldSystem:
+		return m.OldSystem(ctx)
+	case message.FieldDirection:
+		return m.OldDirection(ctx)
+	case message.FieldProactive:
+		return m.OldProactive(ctx)
 	}
 	return nil, fmt.Errorf("unknown Message field %s", name)
 }
@@ -995,6 +1130,27 @@ func (m *MessageMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAttachment(v)
+		return nil
+	case message.FieldSystem:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSystem(v)
+		return nil
+	case message.FieldDirection:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDirection(v)
+		return nil
+	case message.FieldProactive:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProactive(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Message field %s", name)
@@ -1072,6 +1228,15 @@ func (m *MessageMutation) ResetField(name string) error {
 		return nil
 	case message.FieldAttachment:
 		m.ResetAttachment()
+		return nil
+	case message.FieldSystem:
+		m.ResetSystem()
+		return nil
+	case message.FieldDirection:
+		m.ResetDirection()
+		return nil
+	case message.FieldProactive:
+		m.ResetProactive()
 		return nil
 	}
 	return fmt.Errorf("unknown Message field %s", name)

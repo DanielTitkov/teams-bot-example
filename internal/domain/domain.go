@@ -16,11 +16,15 @@ type (
 	}
 	// Message is used for messagers
 	Message struct {
+		ID         int
 		Text       string
 		Attachment string
 		Dialog     DialogMeta // used for callbacks, not stored
 		User       UserMeta
 		Err        error
+		System     string
+		Direction  string
+		Proactive  bool
 	}
 	// UserMeta stores users data for messagers
 	UserMeta struct {
