@@ -13,9 +13,10 @@ const (
 
 type (
 	App struct {
-		cfg    configs.Config
-		logger *logger.Logger
-		repo   Repository
+		cfg           configs.Config
+		logger        *logger.Logger
+		repo          Repository
+		ProactiveChan chan *domain.Message
 	}
 	Repository interface {
 		// users
@@ -43,8 +44,9 @@ func NewApp(
 	repo Repository,
 ) *App {
 	return &App{
-		cfg:    cfg,
-		logger: logger,
-		repo:   repo,
+		cfg:           cfg,
+		logger:        logger,
+		repo:          repo,
+		ProactiveChan: make(chan *domain.Message),
 	}
 }

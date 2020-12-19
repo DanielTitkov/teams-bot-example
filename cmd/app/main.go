@@ -44,13 +44,11 @@ func main() {
 
 	app := app.NewApp(cfg, logger, repo)
 
-	proactiveChannel := make(chan domain.Message)
-
 	t := teams.NewTeams(cfg, logger)
 	t.SetOnMessageHandler(app.HandleMessage)
 	t.SetOnInvokeHandler(app.HandleInvoke)
 	t.SetOnUpdateHandler(app.HandleUpdate)
-	t.SetProactiveChannel(proactiveChannel)
+	t.SetProactiveChannel(app.ProactiveChan)
 
 	go func() {
 		for {
@@ -62,7 +60,7 @@ func main() {
 				Attachment: string(cardJSON),
 			}
 			time.Sleep(50000 * time.Second)
-			proactiveChannel <- m
+			app.ProactiveChan <- &m
 			fmt.Println("PROACTIVE PUSHED")
 		}
 	}()

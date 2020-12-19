@@ -24,7 +24,7 @@ type Teams struct {
 	onMessageHandler func(domain.Message) domain.Message
 	onInvokeHandler  func(domain.Message) domain.Message
 	onUpdateHandler  func(domain.Message) domain.Message
-	proactiveChan    <-chan domain.Message
+	proactiveChan    <-chan *domain.Message
 }
 
 func NewTeams(
@@ -60,7 +60,7 @@ func (t *Teams) SetOnUpdateHandler(handler func(domain.Message) domain.Message) 
 	t.onUpdateHandler = handler
 }
 
-func (t *Teams) SetProactiveChannel(ch chan domain.Message) {
+func (t *Teams) SetProactiveChannel(ch chan *domain.Message) {
 	t.proactiveChan = ch
 }
 
@@ -127,11 +127,11 @@ func (t *Teams) RunProactiveManager() {
 	}
 }
 
-func (t *Teams) sendMessage(message domain.Message) {
+func (t *Teams) sendMessage(message *domain.Message) {
 	var ref schema.ConversationReference
 	err := json.Unmarshal([]byte(message.Dialog.Teams), &ref)
 	if err != nil {
-		t.logger.Error("Failed to unmarshal conversation reference", err)
+		t.logger.Error("failed to unmarshal conversation reference", err)
 		return
 	}
 

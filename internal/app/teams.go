@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
@@ -99,4 +100,12 @@ func (a *App) GetOrCreateTeamsUserDialog(message domain.Message, user *domain.Us
 		a.logger.Info("dialog fetched", fmt.Sprint(dialog))
 	}
 	return dialog, nil
+}
+
+func (a *App) SendTeamsProactive(m *domain.Message) error {
+	if m.Dialog.Teams == "" {
+		return errors.New("teams dialog reference is required to send proactive message")
+	}
+	a.ProactiveChan <- m // TODO: maybe add timeout
+	return nil
 }

@@ -14,4 +14,4 @@ entgen:
 
 .PHONY: expose
 expose:
-	/home/titkovd/Desktop/ngrok http 3978
+	/home/titkovd/Desktop/ngrok http -hostname=teamsbot1.ngrok.io 3978
