@@ -31,15 +31,18 @@ func (a *App) HandleMessage(message domain.Message) domain.Message {
 	}
 
 	if message.Err != nil {
-		message.Text = fmt.Sprintf("error occured during processing message: %s", message.Err.Error())
+		message.Text = buildProcessingFailedMessage(message.Err)
 		return message
 	}
 
-	// call message replier
+	reply, err := a.buildReply(&message)
+	if err != nil {
+		message.Text = buildBuildingReplyFailedMessage(err)
+		return message
+	}
 	// store reply
 
-	message.Text = "Echo for user " + user.DisplayName + ": " + message.Text
-	return message
+	return *reply
 }
 
 func (a *App) HandleInvoke(message domain.Message) domain.Message {
@@ -63,7 +66,7 @@ func (a *App) GetOrCreateTeamsUser(message domain.Message) (*domain.User, error)
 
 		user, err = a.repo.CreateUser(&domain.User{
 			DisplayName:  *message.User.Teams.Username,
-			Username:     GenerateUserLogin(*message.User.Teams.Username), // TODO: generate unique name
+			Username:     GenerateUserLogin(*message.User.Teams.Username),
 			PasswordHash: string(hash),
 			Email:        "sample@email.com", // FIXME
 			Meta: domain.UserMeta{
