@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	TeamsSystemCode  = "teams"
-	InputMessageCode = "input"
+	TeamsSystemCode   = "teams"
+	InputMessageCode  = "input"
+	OutputMessageCode = "output"
 )
 
 type (

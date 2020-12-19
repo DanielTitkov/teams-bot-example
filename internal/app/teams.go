@@ -63,7 +63,7 @@ func (a *App) GetOrCreateTeamsUser(message domain.Message) (*domain.User, error)
 
 		user, err = a.repo.CreateUser(&domain.User{
 			DisplayName:  *message.User.Teams.Username,
-			Username:     *message.User.Teams.Username, // TODO: generate unique name
+			Username:     GenerateUserLogin(*message.User.Teams.Username), // TODO: generate unique name
 			PasswordHash: string(hash),
 			Email:        "sample@email.com", // FIXME
 			Meta: domain.UserMeta{
@@ -76,7 +76,22 @@ func (a *App) GetOrCreateTeamsUser(message domain.Message) (*domain.User, error)
 			return nil, err
 		}
 		a.logger.Info("user created", fmt.Sprint(user))
-		// TODO: add proacitve - user created
+
+		err = a.SendTeamsProactive(&domain.Message{ // FIXME
+			Text: buildUserCreatedMessage(user.DisplayName, user.Username),
+			Dialog: domain.DialogMeta{
+				Teams: message.Dialog.Teams,
+			},
+			System:    TeamsSystemCode,
+			Direction: OutputMessageCode,
+			Proactive: true,
+		})
+		if err != nil {
+			a.logger.Error("failed to send user created notification", err)
+		} else {
+			a.logger.Info("user created notification sent", fmt.Sprint())
+		}
+
 	} else {
 		a.logger.Info("user fetched", fmt.Sprint(user))
 	}

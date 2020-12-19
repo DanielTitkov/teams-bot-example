@@ -38,7 +38,7 @@ func NewTeams(
 
 	adapter, err := core.NewBotAdapter(setting)
 	if err != nil {
-		log.Fatal("Error creating adapter: ", err)
+		log.Fatal("error creating adapter: ", err)
 	}
 
 	return &Teams{
@@ -84,18 +84,18 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 
 	act, err := t.adapter.ParseRequest(ctx, req)
 	if err != nil {
-		t.logger.Error("Failed to parse request", err)
+		t.logger.Error("failed to parse request", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	err = t.adapter.ProcessActivity(ctx, act, handler)
 	if err != nil {
-		t.logger.Error("Failed to process request", err)
+		t.logger.Error("failed to process request", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	t.logger.Info("Request processed successfully", "")
+	t.logger.Info("request processed successfully", "")
 }
 
 func (t *Teams) Listen() error {
@@ -137,22 +137,25 @@ func (t *Teams) sendMessage(message *domain.Message) {
 
 	var proactiveHandler = activity.HandlerFuncs{
 		OnMessageFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
-			var obj map[string]interface{}
-			err := json.Unmarshal([]byte(message.Attachment), &obj)
-			if err != nil {
-				return schema.Activity{}, err
-			}
-			attachments := []schema.Attachment{
-				{
-					ContentType: "application/vnd.microsoft.card.adaptive",
-					Content:     obj,
-				},
-			}
-			return turn.SendActivity(activity.MsgOptionText("Sample attachment"), activity.MsgOptionAttachments(attachments))
+			// var obj map[string]interface{}
+			// err := json.Unmarshal([]byte(message.Attachment), &obj)
+			// if err != nil {
+			// 	return schema.Activity{}, err
+			// }
+			// attachments := []schema.Attachment{
+			// 	{
+			// 		ContentType: "application/vnd.microsoft.card.adaptive",
+			// 		Content:     obj,
+			// 	},
+			// }
+			return turn.SendActivity(
+				activity.MsgOptionText(message.Text),
+				// activity.MsgOptionAttachments(attachments),
+			)
 		},
 	}
 
-	err = t.adapter.ProactiveMessage(context.TODO(), ref, proactiveHandler)
+	err = t.adapter.ProactiveMessage(context.Background(), ref, proactiveHandler)
 	if err != nil {
 		t.logger.Error("Failed to send proactive message.", err)
 		return
