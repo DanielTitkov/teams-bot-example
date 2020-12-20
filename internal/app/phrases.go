@@ -1,10 +1,15 @@
 package app
 
-import "fmt"
+import (
+	"fmt"
+	"regexp"
+)
 
 const (
 	defaultReplyText = "Робот автоматизации бизнеса приветствует вас"
 )
+
+var createProjectRequest = regexp.MustCompile(`Создать проект [\w\d]+ [\w\d]+`)
 
 func buildUserCreatedMessage(displayName, login string) string {
 	return fmt.Sprintf("Создан новый пользователь: %s. Сгенерированный логин: '%s'.", displayName, login)
@@ -16,4 +21,12 @@ func buildProcessingFailedMessage(err error) string {
 
 func buildBuildingReplyFailedMessage(err error) string {
 	return fmt.Sprintf("Ошибка при построении ответа %s", err.Error())
+} // FIXME think about func names
+
+func buildCreateProjectSuccessMessage(title, dueDate string) string {
+	return fmt.Sprintf("Создаю проект %s с датой завершения %s", title, dueDate)
+}
+
+func buildCreateProjectFailedMessage() string {
+	return "Не удалось создать проект"
 }
