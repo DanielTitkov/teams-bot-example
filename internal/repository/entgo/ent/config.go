@@ -26,6 +26,7 @@ type config struct {
 type hooks struct {
 	Dialog  []ent.Hook
 	Message []ent.Hook
+	Project []ent.Hook
 	User    []ent.Hook
 }
 

@@ -16,6 +16,8 @@ type Tx struct {
 	Dialog *DialogClient
 	// Message is the client for interacting with the Message builders.
 	Message *MessageClient
+	// Project is the client for interacting with the Project builders.
+	Project *ProjectClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -155,6 +157,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Dialog = NewDialogClient(tx.config)
 	tx.Message = NewMessageClient(tx.config)
+	tx.Project = NewProjectClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

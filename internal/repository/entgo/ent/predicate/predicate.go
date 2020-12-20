@@ -12,5 +12,8 @@ type Dialog func(*sql.Selector)
 // Message is the predicate function for message builders.
 type Message func(*sql.Selector)
 
+// Project is the predicate function for project builders.
+type Project func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

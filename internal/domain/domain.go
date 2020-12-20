@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 const ()
 
 type (
@@ -48,5 +50,14 @@ type (
 		Teams    string
 		Telegram string // for example
 		Slack    string // for example
+	}
+	// Business logic
+	// not linked to messenges staff
+	// Project
+	Project struct {
+		ID      int
+		User    string
+		Title   string
+		DueDate time.Time
 	}
 )

@@ -30,6 +30,7 @@ func (User) Fields() []ent.Field {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("dialog", Dialog.Type).Unique(),
+		edge.To("projects", Project.Type),
 	}
 }
 

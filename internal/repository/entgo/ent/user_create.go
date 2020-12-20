@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/dialog"
+	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/project"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/user"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
@@ -154,6 +155,21 @@ func (uc *UserCreate) SetNillableDialogID(id *int) *UserCreate {
 // SetDialog sets the dialog edge to Dialog.
 func (uc *UserCreate) SetDialog(d *Dialog) *UserCreate {
 	return uc.SetDialogID(d.ID)
+}
+
+// AddProjectIDs adds the projects edge to Project by ids.
+func (uc *UserCreate) AddProjectIDs(ids ...int) *UserCreate {
+	uc.mutation.AddProjectIDs(ids...)
+	return uc
+}
+
+// AddProjects adds the projects edges to Project.
+func (uc *UserCreate) AddProjects(p ...*Project) *UserCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uc.AddProjectIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -352,6 +368,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: dialog.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.ProjectsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProjectsTable,
+			Columns: []string{user.ProjectsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: project.FieldID,
 				},
 			},
 		}

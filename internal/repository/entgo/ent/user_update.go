@@ -8,6 +8,7 @@ import (
 
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/dialog"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/predicate"
+	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/project"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/user"
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
@@ -159,6 +160,21 @@ func (uu *UserUpdate) SetDialog(d *Dialog) *UserUpdate {
 	return uu.SetDialogID(d.ID)
 }
 
+// AddProjectIDs adds the projects edge to Project by ids.
+func (uu *UserUpdate) AddProjectIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddProjectIDs(ids...)
+	return uu
+}
+
+// AddProjects adds the projects edges to Project.
+func (uu *UserUpdate) AddProjects(p ...*Project) *UserUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uu.AddProjectIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -168,6 +184,21 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 func (uu *UserUpdate) ClearDialog() *UserUpdate {
 	uu.mutation.ClearDialog()
 	return uu
+}
+
+// RemoveProjectIDs removes the projects edge to Project by ids.
+func (uu *UserUpdate) RemoveProjectIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveProjectIDs(ids...)
+	return uu
+}
+
+// RemoveProjects removes projects edges to Project.
+func (uu *UserUpdate) RemoveProjects(p ...*Project) *UserUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uu.RemoveProjectIDs(ids...)
 }
 
 // Save executes the query and returns the number of rows/vertices matched by this operation.
@@ -376,6 +407,44 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if nodes := uu.mutation.RemovedProjectsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProjectsTable,
+			Columns: []string{user.ProjectsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: project.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.ProjectsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProjectsTable,
+			Columns: []string{user.ProjectsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: project.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -525,6 +594,21 @@ func (uuo *UserUpdateOne) SetDialog(d *Dialog) *UserUpdateOne {
 	return uuo.SetDialogID(d.ID)
 }
 
+// AddProjectIDs adds the projects edge to Project by ids.
+func (uuo *UserUpdateOne) AddProjectIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddProjectIDs(ids...)
+	return uuo
+}
+
+// AddProjects adds the projects edges to Project.
+func (uuo *UserUpdateOne) AddProjects(p ...*Project) *UserUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uuo.AddProjectIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -534,6 +618,21 @@ func (uuo *UserUpdateOne) Mutation() *UserMutation {
 func (uuo *UserUpdateOne) ClearDialog() *UserUpdateOne {
 	uuo.mutation.ClearDialog()
 	return uuo
+}
+
+// RemoveProjectIDs removes the projects edge to Project by ids.
+func (uuo *UserUpdateOne) RemoveProjectIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveProjectIDs(ids...)
+	return uuo
+}
+
+// RemoveProjects removes projects edges to Project.
+func (uuo *UserUpdateOne) RemoveProjects(p ...*Project) *UserUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uuo.RemoveProjectIDs(ids...)
 }
 
 // Save executes the query and returns the updated entity.
@@ -732,6 +831,44 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (u *User, err error) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: dialog.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nodes := uuo.mutation.RemovedProjectsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProjectsTable,
+			Columns: []string{user.ProjectsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: project.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.ProjectsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProjectsTable,
+			Columns: []string{user.ProjectsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: project.FieldID,
 				},
 			},
 		}

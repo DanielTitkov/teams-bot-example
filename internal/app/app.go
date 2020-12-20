@@ -27,15 +27,15 @@ type (
 		GetUserCount() (int, error)
 
 		// messages
-		CreateMessage(m *domain.Message, d *domain.Dialog) (*domain.Message, error)
+		CreateMessage(*domain.Message, *domain.Dialog) (*domain.Message, error)
 
 		// dialog
 		CreateDialog(*domain.User, *domain.Dialog) (*domain.Dialog, error)
 		GetUserDialog(*domain.User) (*domain.Dialog, error)
 
 		// projects
-		// CreateProject()
-		// GetProjects()
+		CreateProject(*domain.User, *domain.Project) (*domain.Project, error)
+		GetUserProjects(*domain.User) ([]*domain.Project, error)
 	}
 )
 

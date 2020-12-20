@@ -58,6 +58,30 @@ var (
 			},
 		},
 	}
+	// ProjectsColumns holds the columns for the "projects" table.
+	ProjectsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "title", Type: field.TypeString},
+		{Name: "due_date", Type: field.TypeTime},
+		{Name: "user_projects", Type: field.TypeInt, Nullable: true},
+	}
+	// ProjectsTable holds the schema information for the "projects" table.
+	ProjectsTable = &schema.Table{
+		Name:       "projects",
+		Columns:    ProjectsColumns,
+		PrimaryKey: []*schema.Column{ProjectsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "projects_users_projects",
+				Columns: []*schema.Column{ProjectsColumns[5]},
+
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -83,6 +107,7 @@ var (
 	Tables = []*schema.Table{
 		DialogsTable,
 		MessagesTable,
+		ProjectsTable,
 		UsersTable,
 	}
 )
@@ -90,4 +115,5 @@ var (
 func init() {
 	DialogsTable.ForeignKeys[0].RefTable = UsersTable
 	MessagesTable.ForeignKeys[0].RefTable = DialogsTable
+	ProjectsTable.ForeignKeys[0].RefTable = UsersTable
 }

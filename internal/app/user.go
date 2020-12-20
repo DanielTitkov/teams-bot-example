@@ -72,7 +72,7 @@ func (a *App) GetUserToken(u *domain.User) (string, error) {
 	return t, nil
 }
 
-func GenerateUserLogin(name string) string {
+func generateUserLogin(name string) string {
 	reg := regexp.MustCompile(`[^\w]+`)
 	login := reg.ReplaceAllString(name, "")
 	return strings.ToLower(login) + fmt.Sprint(time.Now().Nanosecond())

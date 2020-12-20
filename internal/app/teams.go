@@ -66,7 +66,7 @@ func (a *App) GetOrCreateTeamsUser(message domain.Message) (*domain.User, error)
 
 		user, err = a.repo.CreateUser(&domain.User{
 			DisplayName:  *message.User.Teams.Username,
-			Username:     GenerateUserLogin(*message.User.Teams.Username),
+			Username:     generateUserLogin(*message.User.Teams.Username),
 			PasswordHash: string(hash),
 			Email:        "sample@email.com", // FIXME
 			Meta: domain.UserMeta{

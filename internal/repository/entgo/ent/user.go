@@ -46,9 +46,11 @@ type User struct {
 type UserEdges struct {
 	// Dialog holds the value of the dialog edge.
 	Dialog *Dialog
+	// Projects holds the value of the projects edge.
+	Projects []*Project
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // DialogOrErr returns the Dialog value or an error if the edge
@@ -63,6 +65,15 @@ func (e UserEdges) DialogOrErr() (*Dialog, error) {
 		return e.Dialog, nil
 	}
 	return nil, &NotLoadedError{edge: "dialog"}
+}
+
+// ProjectsOrErr returns the Projects value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ProjectsOrErr() ([]*Project, error) {
+	if e.loadedTypes[1] {
+		return e.Projects, nil
+	}
+	return nil, &NotLoadedError{edge: "projects"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -153,6 +164,11 @@ func (u *User) assignValues(values ...interface{}) error {
 // QueryDialog queries the dialog edge of the User.
 func (u *User) QueryDialog() *DialogQuery {
 	return (&UserClient{config: u.config}).QueryDialog(u)
+}
+
+// QueryProjects queries the projects edge of the User.
+func (u *User) QueryProjects() *ProjectQuery {
+	return (&UserClient{config: u.config}).QueryProjects(u)
 }
 
 // Update returns a builder for updating this User.

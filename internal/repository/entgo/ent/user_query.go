@@ -11,6 +11,7 @@ import (
 
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/dialog"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/predicate"
+	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/project"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/user"
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
@@ -26,7 +27,8 @@ type UserQuery struct {
 	unique     []string
 	predicates []predicate.User
 	// eager-loading edges.
-	withDialog *DialogQuery
+	withDialog   *DialogQuery
+	withProjects *ProjectQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -67,6 +69,24 @@ func (uq *UserQuery) QueryDialog() *DialogQuery {
 			sqlgraph.From(user.Table, user.FieldID, uq.sqlQuery()),
 			sqlgraph.To(dialog.Table, dialog.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, user.DialogTable, user.DialogColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryProjects chains the current query on the projects edge.
+func (uq *UserQuery) QueryProjects() *ProjectQuery {
+	query := &ProjectQuery{config: uq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, uq.sqlQuery()),
+			sqlgraph.To(project.Table, project.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ProjectsTable, user.ProjectsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -264,6 +284,17 @@ func (uq *UserQuery) WithDialog(opts ...func(*DialogQuery)) *UserQuery {
 	return uq
 }
 
+//  WithProjects tells the query-builder to eager-loads the nodes that are connected to
+// the "projects" edge. The optional arguments used to configure the query builder of the edge.
+func (uq *UserQuery) WithProjects(opts ...func(*ProjectQuery)) *UserQuery {
+	query := &ProjectQuery{config: uq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withProjects = query
+	return uq
+}
+
 // GroupBy used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -330,8 +361,9 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			uq.withDialog != nil,
+			uq.withProjects != nil,
 		}
 	)
 	_spec.ScanValues = func() []interface{} {
@@ -380,6 +412,34 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "user_dialog" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Dialog = n
+		}
+	}
+
+	if query := uq.withProjects; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*User)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+		}
+		query.withFKs = true
+		query.Where(predicate.Project(func(s *sql.Selector) {
+			s.Where(sql.InValues(user.ProjectsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.user_projects
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "user_projects" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "user_projects" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Projects = append(node.Edges.Projects, n)
 		}
 	}
 

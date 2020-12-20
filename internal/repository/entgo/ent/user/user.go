@@ -34,6 +34,8 @@ const (
 
 	// EdgeDialog holds the string denoting the dialog edge name in mutations.
 	EdgeDialog = "dialog"
+	// EdgeProjects holds the string denoting the projects edge name in mutations.
+	EdgeProjects = "projects"
 
 	// Table holds the table name of the user in the database.
 	Table = "users"
@@ -44,6 +46,13 @@ const (
 	DialogInverseTable = "dialogs"
 	// DialogColumn is the table column denoting the dialog relation/edge.
 	DialogColumn = "user_dialog"
+	// ProjectsTable is the table the holds the projects relation/edge.
+	ProjectsTable = "projects"
+	// ProjectsInverseTable is the table name for the Project entity.
+	// It exists in this package in order to avoid circular dependency with the "project" package.
+	ProjectsInverseTable = "projects"
+	// ProjectsColumn is the table column denoting the projects relation/edge.
+	ProjectsColumn = "user_projects"
 )
 
 // Columns holds all SQL columns for user fields.

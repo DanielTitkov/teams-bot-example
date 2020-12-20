@@ -7,6 +7,7 @@ import (
 
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/dialog"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/message"
+	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/project"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/schema"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent/user"
 )
@@ -43,6 +44,20 @@ func init() {
 	message.DefaultUpdateTime = messageDescUpdateTime.Default.(func() time.Time)
 	// message.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
 	message.UpdateDefaultUpdateTime = messageDescUpdateTime.UpdateDefault.(func() time.Time)
+	projectMixin := schema.Project{}.Mixin()
+	projectMixinFields0 := projectMixin[0].Fields()
+	projectFields := schema.Project{}.Fields()
+	_ = projectFields
+	// projectDescCreateTime is the schema descriptor for create_time field.
+	projectDescCreateTime := projectMixinFields0[0].Descriptor()
+	// project.DefaultCreateTime holds the default value on creation for the create_time field.
+	project.DefaultCreateTime = projectDescCreateTime.Default.(func() time.Time)
+	// projectDescUpdateTime is the schema descriptor for update_time field.
+	projectDescUpdateTime := projectMixinFields0[1].Descriptor()
+	// project.DefaultUpdateTime holds the default value on creation for the update_time field.
+	project.DefaultUpdateTime = projectDescUpdateTime.Default.(func() time.Time)
+	// project.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	project.UpdateDefaultUpdateTime = projectDescUpdateTime.UpdateDefault.(func() time.Time)
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	userFields := schema.User{}.Fields()
