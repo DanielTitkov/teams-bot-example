@@ -52,15 +52,21 @@ func main() {
 
 	go func() {
 		for {
-			m := domain.Message{
-				Text: "Proactive text",
-				Dialog: domain.DialogMeta{
-					Teams: dialogData,
+			t := domain.Turn{
+				Message: domain.Message{
+					Text: "Proactive text",
+
+					Attachment: string(cardJSON),
 				},
-				Attachment: string(cardJSON),
+				Dialog: domain.TurnDialog{
+					Meta: domain.DialogMeta{
+						Teams: dialogData,
+					},
+				},
 			}
+
 			time.Sleep(50000 * time.Second)
-			app.ProactiveChan <- &m
+			app.ProactiveChan <- &t
 			fmt.Println("PROACTIVE PUSHED")
 		}
 	}()

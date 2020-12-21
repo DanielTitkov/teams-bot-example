@@ -9,41 +9,45 @@ import (
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
 )
 
-var replyMapping = map[string]func(*domain.Message) (*domain.Message, error){}
+var replyMapping = map[string]func(*domain.Turn) (*domain.Turn, error){}
 
-func (a *App) buildReply(message *domain.Message) (*domain.Message, error) {
-	message.Direction = OutputMessageCode
-	text := message.Text
+func (a *App) buildReply(turn *domain.Turn) (*domain.Turn, error) {
+	turn.Message.Direction = OutputMessageCode
+	text := turn.Message.Text
 
 	switch {
 	case matchWithRegexp(text, createProjectRequest):
-		return a.createProjectReply(message)
+		return a.createProjectReply(turn)
 	default:
-		return a.defaultReply(message)
+		return a.defaultReply(turn)
 	}
 }
 
-func (a *App) defaultReply(message *domain.Message) (*domain.Message, error) {
-	return &domain.Message{
-		Text:      defaultReplyText,
-		Direction: OutputMessageCode,
-		System:    message.System,
-		Proactive: false,
+func (a *App) defaultReply(turn *domain.Turn) (*domain.Turn, error) {
+	return &domain.Turn{
+		Message: domain.Message{
+			Text:      defaultReplyText,
+			Direction: OutputMessageCode,
+			System:    turn.Message.System,
+			Proactive: false,
+		},
 	}, nil
 }
 
-func (a *App) createProjectReply(message *domain.Message) (*domain.Message, error) {
+func (a *App) createProjectReply(turn *domain.Turn) (*domain.Turn, error) {
 	var reply string
-	tokens := strings.Split(message.Text, " ")
+	tokens := strings.Split(turn.Message.Text, " ")
 	if len(tokens) < 4 {
 		reply = buildCreateProjectFailedMessage()
 	}
 	reply = buildCreateProjectSuccessMessage(tokens[2], tokens[3])
-	return &domain.Message{
-		Text:      reply,
-		Direction: OutputMessageCode,
-		System:    message.System,
-		Proactive: false,
+	return &domain.Turn{
+		Message: domain.Message{
+			Text:      reply,
+			Direction: OutputMessageCode,
+			System:    turn.Message.System,
+			Proactive: false,
+		},
 	}, nil
 }
 

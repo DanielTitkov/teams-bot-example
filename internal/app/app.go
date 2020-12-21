@@ -17,7 +17,7 @@ type (
 		cfg           configs.Config
 		logger        *logger.Logger
 		repo          Repository
-		ProactiveChan chan *domain.Message
+		ProactiveChan chan *domain.Turn
 	}
 	Repository interface {
 		// users
@@ -48,6 +48,6 @@ func NewApp(
 		cfg:           cfg,
 		logger:        logger,
 		repo:          repo,
-		ProactiveChan: make(chan *domain.Message),
+		ProactiveChan: make(chan *domain.Turn),
 	}
 }

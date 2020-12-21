@@ -21,10 +21,10 @@ type Teams struct {
 	adapter          core.Adapter
 	cfg              configs.Config
 	logger           *logger.Logger
-	onMessageHandler func(domain.Message) domain.Message
-	onInvokeHandler  func(domain.Message) domain.Message
-	onUpdateHandler  func(domain.Message) domain.Message
-	proactiveChan    <-chan *domain.Message
+	onMessageHandler func(domain.Turn) domain.Turn
+	onInvokeHandler  func(domain.Turn) domain.Turn
+	onUpdateHandler  func(domain.Turn) domain.Turn
+	proactiveChan    <-chan *domain.Turn
 }
 
 func NewTeams(
@@ -48,19 +48,19 @@ func NewTeams(
 	}
 }
 
-func (t *Teams) SetOnMessageHandler(handler func(domain.Message) domain.Message) {
+func (t *Teams) SetOnMessageHandler(handler func(domain.Turn) domain.Turn) {
 	t.onMessageHandler = handler
 }
 
-func (t *Teams) SetOnInvokeHandler(handler func(domain.Message) domain.Message) {
+func (t *Teams) SetOnInvokeHandler(handler func(domain.Turn) domain.Turn) {
 	t.onInvokeHandler = handler
 }
 
-func (t *Teams) SetOnUpdateHandler(handler func(domain.Message) domain.Message) {
+func (t *Teams) SetOnUpdateHandler(handler func(domain.Turn) domain.Turn) {
 	t.onUpdateHandler = handler
 }
 
-func (t *Teams) SetProactiveChannel(ch chan *domain.Message) {
+func (t *Teams) SetProactiveChannel(ch chan *domain.Turn) {
 	t.proactiveChan = ch
 }
 
@@ -68,17 +68,17 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
 
 	var handler = activity.HandlerFuncs{
-		OnMessageFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
-			response := t.onMessageHandler(t.activityToMessage(turn))
-			return turn.SendActivity(activity.MsgOptionText(response.Text))
+		OnMessageFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
+			response := t.onMessageHandler(t.activityToTurn(turnCtx))
+			return turnCtx.SendActivity(activity.MsgOptionText(response.Message.Text))
 		},
-		OnInvokeFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
-			response := t.onInvokeHandler(t.activityToMessage(turn))
-			return turn.SendActivity(activity.MsgOptionText(response.Text))
+		OnInvokeFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
+			response := t.onInvokeHandler(t.activityToTurn(turnCtx))
+			return turnCtx.SendActivity(activity.MsgOptionText(response.Message.Text))
 		},
-		OnConversationUpdateFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
-			response := t.onUpdateHandler(t.activityToMessage(turn))
-			return turn.SendActivity(activity.MsgOptionText(response.Text))
+		OnConversationUpdateFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
+			response := t.onUpdateHandler(t.activityToTurn(turnCtx))
+			return turnCtx.SendActivity(activity.MsgOptionText(response.Message.Text))
 		},
 	}
 
@@ -127,16 +127,16 @@ func (t *Teams) RunProactiveManager() {
 	}
 }
 
-func (t *Teams) sendMessage(message *domain.Message) {
+func (t *Teams) sendMessage(turn *domain.Turn) {
 	var ref schema.ConversationReference
-	err := json.Unmarshal([]byte(message.Dialog.Teams), &ref)
+	err := json.Unmarshal([]byte(turn.Dialog.Meta.Teams), &ref)
 	if err != nil {
 		t.logger.Error("failed to unmarshal conversation reference", err)
 		return
 	}
 
 	var proactiveHandler = activity.HandlerFuncs{
-		OnMessageFunc: func(turn *activity.TurnContext) (schema.Activity, error) {
+		OnMessageFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
 			// var obj map[string]interface{}
 			// err := json.Unmarshal([]byte(message.Attachment), &obj)
 			// if err != nil {
@@ -148,8 +148,8 @@ func (t *Teams) sendMessage(message *domain.Message) {
 			// 		Content:     obj,
 			// 	},
 			// }
-			return turn.SendActivity(
-				activity.MsgOptionText(message.Text),
+			return turnCtx.SendActivity(
+				activity.MsgOptionText(turn.Message.Text),
 				// activity.MsgOptionAttachments(attachments),
 			)
 		},
@@ -160,21 +160,27 @@ func (t *Teams) sendMessage(message *domain.Message) {
 		t.logger.Error("Failed to send proactive message.", err)
 		return
 	}
-	t.logger.Info("Proactive message sent successfully.", fmt.Sprintf("%+v", message))
+	t.logger.Info("Proactive message sent successfully.", fmt.Sprintf("%+v", turn.Message))
 }
 
-func (t *Teams) activityToMessage(turn *activity.TurnContext) domain.Message {
-	conversationRef := activity.GetCoversationReference(turn.Activity)
+func (t *Teams) activityToTurn(turnCtx *activity.TurnContext) domain.Turn {
+	conversationRef := activity.GetCoversationReference(turnCtx.Activity)
 	jsonRef, err := json.Marshal(conversationRef)
-	return domain.Message{
-		Text: turn.Activity.Text,
-		Dialog: domain.DialogMeta{
-			Teams: string(jsonRef),
+	return domain.Turn{
+		Message: domain.Message{
+			Text: turnCtx.Activity.Text,
 		},
-		User: domain.UserMeta{
-			Teams: domain.UserMessagerData{
-				ID:       &conversationRef.User.ID,
-				Username: &conversationRef.User.Name,
+		Dialog: domain.TurnDialog{
+			Meta: domain.DialogMeta{
+				Teams: string(jsonRef),
+			},
+		},
+		User: domain.TurnUser{
+			Meta: domain.UserMeta{
+				Teams: domain.UserMessagerData{
+					ID:       &conversationRef.User.ID,
+					Username: &conversationRef.User.Name,
+				},
 			},
 		},
 		Err: err,

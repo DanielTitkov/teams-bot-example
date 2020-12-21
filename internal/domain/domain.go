@@ -17,16 +17,30 @@ type (
 		Meta         UserMeta // stores messagers ids
 	}
 	// Message is used for messagers
-	Message struct {
+	Message struct { // TODO: maybe create container objects instead
 		ID         int
 		Text       string
 		Attachment string
-		Dialog     DialogMeta // used for callbacks, not stored
-		User       UserMeta
-		Err        error
 		System     string
 		Direction  string
 		Proactive  bool
+	}
+	// Turn container strores all recieved data
+	Turn struct {
+		Message Message
+		Dialog  TurnDialog // used for callbacks, not stored
+		User    TurnUser   // TODO: think about it
+		Err     error
+	}
+	// TurnUser hodls dialog data for message processor
+	TurnUser struct {
+		User *User
+		Meta UserMeta
+	}
+	// TurnDialog hodls dialog data for message processor
+	TurnDialog struct {
+		Dialog *Dialog
+		Meta   DialogMeta
 	}
 	// UserMeta stores users data for messagers
 	UserMeta struct {

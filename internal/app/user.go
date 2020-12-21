@@ -77,3 +77,53 @@ func generateUserLogin(name string) string {
 	login := reg.ReplaceAllString(name, "")
 	return strings.ToLower(login) + fmt.Sprint(time.Now().Nanosecond())
 }
+
+func (a *App) GetOrCreateTeamsUser(turn domain.Turn) (*domain.User, error) {
+	user, err := a.repo.GetUserByTeamsID(*turn.User.Meta.Teams.ID)
+	if err != nil {
+		password := "123" // FIXME
+		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+		if err != nil {
+			return nil, err
+		}
+
+		user, err = a.repo.CreateUser(&domain.User{
+			DisplayName:  *turn.User.Meta.Teams.Username,
+			Username:     generateUserLogin(*turn.User.Meta.Teams.Username),
+			PasswordHash: string(hash),
+			Email:        "sample@email.com", // FIXME
+			Meta: domain.UserMeta{
+				Teams: domain.UserMessagerData{
+					ID: turn.User.Meta.Teams.ID,
+				},
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+		a.logger.Info("user created", fmt.Sprint(user))
+
+		err = a.SendTeamsProactive(&domain.Turn{ // FIXME
+			Message: domain.Message{
+				Text:      buildUserCreatedMessage(user.DisplayName, user.Username),
+				System:    TeamsSystemCode, // TODO: maybe put to turn
+				Direction: OutputMessageCode,
+				Proactive: true,
+			},
+			Dialog: domain.TurnDialog{
+				Meta: domain.DialogMeta{
+					Teams: turn.Dialog.Meta.Teams,
+				},
+			},
+		})
+		if err != nil {
+			a.logger.Error("failed to send user created notification", err)
+		} else {
+			a.logger.Info("user created notification sent", fmt.Sprint())
+		}
+
+	} else {
+		a.logger.Info("user fetched", fmt.Sprint(user))
+	}
+	return user, nil
+}
