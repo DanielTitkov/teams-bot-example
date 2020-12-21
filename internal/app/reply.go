@@ -29,14 +29,9 @@ func (a *App) buildReply(turn *domain.Turn) (*domain.Turn, error) {
 }
 
 func (a *App) defaultReply(turn *domain.Turn) (*domain.Turn, error) {
-	return &domain.Turn{
-		Message: domain.Message{
-			Text:      defaultReplyText,
-			Direction: OutputMessageCode,
-			System:    turn.Message.System,
-			Proactive: false,
-		},
-	}, nil
+	reply := makeOutputTurn(turn)
+	reply.Message.Text = defaultReplyText
+	return reply, nil
 }
 
 func (a *App) createProjectReply(turn *domain.Turn) (*domain.Turn, error) {
@@ -94,5 +89,7 @@ func makeOutputTurn(turn *domain.Turn) *domain.Turn {
 			System:    turn.Message.System,
 			Proactive: false,
 		},
+		Dialog: turn.Dialog,
+		User:   turn.User,
 	}
 }
