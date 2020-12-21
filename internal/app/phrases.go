@@ -11,7 +11,8 @@ const (
 	defaultDateTimeLayout = "02.01.2006"
 )
 
-var createProjectRequest = regexp.MustCompile(`Создать проект [\w\d]+ [\w\d]+`)
+var createProjectRequest = regexp.MustCompile(`Создать проект [\w\d]+ [\w\d]+\s*`)
+var listProjiectsRequest = regexp.MustCompile(`Мои проекты\s*`)
 
 func buildUserCreatedMessage(displayName, login string) string {
 	return fmt.Sprintf("Создан новый пользователь: %s. Сгенерированный логин: '%s'.", displayName, login)
@@ -36,4 +37,8 @@ func buildCreateProjectSuccessMessage(title string, dueDate time.Time, id int) s
 
 func buildCreateProjectFailedMessage(err error) string {
 	return fmt.Sprint("не удалось создать проект: %s", err.Error())
+}
+
+func buildListProjectsFailedMessage(err error) string {
+	return fmt.Sprintf("не удалось получить список проектов: %s", err.Error())
 }

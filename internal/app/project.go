@@ -11,3 +11,11 @@ func (a *App) CreateProject(t *domain.Turn, p *domain.Project) (*domain.Project,
 	}
 	return project, nil
 }
+
+func (a *App) GetUserProjects(t *domain.Turn) ([]*domain.Project, error) { // TODO: think of signature
+	projects, err := a.repo.GetUserProjects(t.User.User)
+	if err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
