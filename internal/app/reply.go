@@ -3,8 +3,10 @@ package app
 // FIXME maybe reply is not good file name
 
 import (
+	"errors"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
 )
@@ -35,20 +37,35 @@ func (a *App) defaultReply(turn *domain.Turn) (*domain.Turn, error) {
 }
 
 func (a *App) createProjectReply(turn *domain.Turn) (*domain.Turn, error) {
-	var reply string
-	tokens := strings.Split(turn.Message.Text, " ")
-	if len(tokens) < 4 {
-		reply = buildCreateProjectFailedMessage()
-	}
-	reply = buildCreateProjectSuccessMessage(tokens[2], tokens[3])
-	return &domain.Turn{
+	reply := &domain.Turn{
 		Message: domain.Message{
-			Text:      reply,
 			Direction: OutputMessageCode,
 			System:    turn.Message.System,
 			Proactive: false,
 		},
-	}, nil
+	}
+
+	tokens := strings.Split(turn.Message.Text, " ")
+	if len(tokens) < 4 {
+		return nil, errors.New(buildCreateProjectFailedMessage(errors.New("not enough data to create project, check input")))
+	}
+	projectTitle := tokens[2]
+	projectDueDate, err := time.Parse(defaultDateTimeLayout, strings.TrimSpace(tokens[3]))
+	if err != nil {
+		return nil, errors.New(buildCreateProjectFailedMessage(err))
+	}
+	project, err := a.CreateProject(turn, &domain.Project{
+		User:    turn.User.User.Username,
+		Title:   projectTitle,
+		DueDate: projectDueDate,
+	})
+	if err != nil {
+		return nil, errors.New(buildCreateProjectFailedMessage(err))
+	}
+
+	reply.Message.Text = buildCreateProjectSuccessMessage(projectTitle, projectDueDate, project.ID)
+
+	return reply, nil
 }
 
 func matchWithRegexp(text string, reg *regexp.Regexp) bool {
