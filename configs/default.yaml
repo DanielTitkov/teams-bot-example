@@ -10,6 +10,7 @@ auth:
   secret: secret-key
 job: 
   sampleJobPeriod: 20 # seconds
+  projectNotificationPeriod: 300 # seconds
 teams:
   appID: ""
   appPassword: ""

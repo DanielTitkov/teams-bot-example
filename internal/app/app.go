@@ -36,6 +36,7 @@ type (
 		// projects
 		CreateProject(*domain.User, *domain.Project) (*domain.Project, error)
 		GetUserProjects(*domain.User) ([]*domain.Project, error)
+		GetRandomProjectByUser() ([]*domain.Project, error) // for sample notifications
 	}
 )
 

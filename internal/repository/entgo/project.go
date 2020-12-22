@@ -2,6 +2,8 @@ package entgo
 
 import (
 	"context"
+	"math/rand"
+	"time"
 
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent"
@@ -38,6 +40,24 @@ func (r *EntgoRepository) GetUserProjects(u *domain.User) ([]*domain.Project, er
 		res = append(res, r.entToDomainProject(u, p))
 	}
 
+	return res, nil
+}
+
+func (r *EntgoRepository) GetRandomProjectByUser() ([]*domain.Project, error) {
+	users, err := r.client.User.
+		Query().
+		WithProjects().
+		All(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	var res []*domain.Project
+	for _, u := range users {
+		projects := u.Edges.Projects
+		rnd := rand.New(rand.NewSource(time.Now().Unix()))
+		project := projects[rnd.Intn(len(projects))]
+		res = append(res, r.entToDomainProject(&domain.User{Username: u.Username}, project))
+	}
 	return res, nil
 }
 

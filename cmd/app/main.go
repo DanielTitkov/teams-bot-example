@@ -9,6 +9,7 @@ import (
 	"github.com/DanielTitkov/teams-bot-example/internal/app"
 	"github.com/DanielTitkov/teams-bot-example/internal/configs"
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
+	"github.com/DanielTitkov/teams-bot-example/internal/job"
 	"github.com/DanielTitkov/teams-bot-example/internal/logger"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent"
@@ -49,6 +50,9 @@ func main() {
 	t.SetOnInvokeHandler(app.HandleInvoke)
 	t.SetOnUpdateHandler(app.HandleUpdate)
 	t.SetProactiveChannel(app.ProactiveChan)
+
+	jobs := job.NewService(cfg, logger, app)
+	jobs.SendProjectNotifications() // TODO: maybe hide it inside jobs
 
 	go func() {
 		for {

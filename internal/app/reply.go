@@ -68,8 +68,8 @@ func (a *App) listProjectsReply(turn *domain.Turn) (*domain.Turn, error) {
 	}
 	var replyText string
 	for i, p := range projects {
-		replyText += fmt.Sprintf(
-			"%d) ID: %d, название: %s, дата завершения: %s\n",
+		replyText += fmt.Sprintf( // TODO: move to phrases
+			"Ваши проекты:\n%d) ID: %d, название: %s, дата завершения: %s\n",
 			i+1, p.ID, p.Title, p.DueDate.Format(time.RubyDate),
 		)
 	}

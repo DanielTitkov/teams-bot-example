@@ -42,3 +42,7 @@ func buildCreateProjectFailedMessage(err error) string {
 func buildListProjectsFailedMessage(err error) string {
 	return fmt.Sprintf("не удалось получить список проектов: %s", err.Error())
 }
+
+func buildProjectNotificationText(title string, id int, minutes int64) string {
+	return fmt.Sprintf("До завершения проекта %s (ID: %d) осталось всего %d минут!", title, id, minutes)
+}

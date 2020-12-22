@@ -1,6 +1,8 @@
 package app
 
 import (
+	"time"
+
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
 )
 
@@ -18,4 +20,43 @@ func (a *App) GetUserProjects(t *domain.Turn) ([]*domain.Project, error) { // TO
 		return nil, err
 	}
 	return projects, nil
+}
+
+// SendProjectNotifications implementation sucks.
+// It's only for testing.
+func (a *App) SendProjectNotifications() error {
+	projects, err := a.repo.GetRandomProjectByUser()
+	if err != nil {
+		return err
+	}
+	for _, p := range projects {
+		dialog, err := a.repo.GetUserDialog(&domain.User{Username: p.User})
+		if err != nil {
+			return err
+		}
+
+		err = a.SendTeamsProactive(&domain.Turn{
+			Dialog: domain.TurnDialog{
+				Dialog: dialog,
+				Meta:   dialog.Meta,
+			},
+			Message: domain.Message{
+				Text: buildProjectNotificationText(
+					p.Title,
+					p.ID,
+					minutesFormNow(p.DueDate),
+				),
+			},
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func minutesFormNow(t time.Time) int64 {
+	now := time.Now()
+	diff := now.Sub(t)
+	return int64(diff.Minutes()) * -1
 }

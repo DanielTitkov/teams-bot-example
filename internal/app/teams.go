@@ -68,6 +68,8 @@ func (a *App) SendTeamsProactive(t *domain.Turn) error {
 	if t.Dialog.Meta.Teams == "" {
 		return errors.New("teams dialog reference is required to send proactive turn")
 	}
+	t.Message.Proactive = true
+	t.Message.Direction = OutputMessageCode
 	a.ProactiveChan <- t // TODO: maybe add timeout
 	return nil
 }
