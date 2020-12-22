@@ -66,10 +66,10 @@ func (a *App) listProjectsReply(turn *domain.Turn) (*domain.Turn, error) {
 	if err != nil {
 		return nil, errors.New(buildListProjectsFailedMessage(err))
 	}
-	var replyText string
+	replyText := "Ваши проекты:\n"
 	for i, p := range projects {
 		replyText += fmt.Sprintf( // TODO: move to phrases
-			"Ваши проекты:\n%d) ID: %d, название: %s, дата завершения: %s\n",
+			"%d) ID: %d, название: %s, дата завершения: %s\n",
 			i+1, p.ID, p.Title, p.DueDate.Format(time.RubyDate),
 		)
 	}

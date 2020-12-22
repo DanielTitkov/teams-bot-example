@@ -11,7 +11,7 @@ const (
 	defaultDateTimeLayout = "02.01.2006"
 )
 
-var createProjectRequest = regexp.MustCompile(`Создать проект [\w\d]+ [\w\d]+\s*`)
+var createProjectRequest = regexp.MustCompile(`Создать проект [\w\p{L}-]+ [\w\d]+\s*`)
 var listProjiectsRequest = regexp.MustCompile(`Мои проекты\s*`)
 
 func buildUserCreatedMessage(displayName, login string) string {
