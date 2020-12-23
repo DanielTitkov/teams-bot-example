@@ -16,6 +16,12 @@ import (
 	"github.com/infracloudio/msbotbuilder-go/schema"
 )
 
+const (
+	systemCode = "teams"
+	ouputCode  = "output"
+	inputCode  = "input"
+)
+
 // Teams handles the HTTP requests from then connector service
 type Teams struct {
 	adapter          core.Adapter
@@ -25,6 +31,7 @@ type Teams struct {
 	onInvokeHandler  func(domain.Turn) domain.Turn
 	onUpdateHandler  func(domain.Turn) domain.Turn
 	proactiveChan    <-chan *domain.Turn
+	sentChan         chan<- *domain.Turn
 }
 
 func NewTeams(
@@ -64,20 +71,35 @@ func (t *Teams) SetProactiveChannel(ch chan *domain.Turn) {
 	t.proactiveChan = ch
 }
 
+func (t *Teams) SetSentChannel(ch chan *domain.Turn) {
+	t.sentChan = ch
+}
+
 func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
+	var turn *domain.Turn
+
+	defer func() {
+		turn.Message.Direction = ouputCode
+		turn.Message.System = systemCode
+		turn.Message.Proactive = false
+		t.turnToSentChan(turn)
+	}()
 
 	var handler = activity.HandlerFuncs{
 		OnMessageFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
 			response := t.onMessageHandler(t.activityToTurn(turnCtx))
+			turn = &response
 			return turnCtx.SendActivity(activity.MsgOptionText(response.Message.Text))
 		},
 		OnInvokeFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
 			response := t.onInvokeHandler(t.activityToTurn(turnCtx))
+			turn = &response
 			return turnCtx.SendActivity(activity.MsgOptionText(response.Message.Text))
 		},
 		OnConversationUpdateFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
 			response := t.onUpdateHandler(t.activityToTurn(turnCtx))
+			turn = &response
 			return turnCtx.SendActivity(activity.MsgOptionText(response.Message.Text))
 		},
 	}
@@ -85,6 +107,7 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 	act, err := t.adapter.ParseRequest(ctx, req)
 	if err != nil {
 		t.logger.Error("failed to parse request", err)
+		turn.Err = err
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -92,6 +115,7 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 	err = t.adapter.ProcessActivity(ctx, act, handler)
 	if err != nil {
 		t.logger.Error("failed to process request", err)
+		turn.Err = err
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -127,12 +151,20 @@ func (t *Teams) RunProactiveManager() {
 	}
 }
 
-func (t *Teams) sendMessage(turn *domain.Turn) {
+func (t *Teams) sendMessage(turn *domain.Turn) *domain.Turn {
+	defer func() {
+		turn.Message.Direction = ouputCode
+		turn.Message.System = systemCode
+		turn.Message.Proactive = true
+		t.turnToSentChan(turn)
+	}()
+
 	var ref schema.ConversationReference
 	err := json.Unmarshal([]byte(turn.Dialog.Meta.Teams), &ref)
 	if err != nil {
 		t.logger.Error("failed to unmarshal conversation reference", err)
-		return
+		turn.Err = err
+		return turn
 	}
 
 	var proactiveHandler = activity.HandlerFuncs{
@@ -158,9 +190,11 @@ func (t *Teams) sendMessage(turn *domain.Turn) {
 	err = t.adapter.ProactiveMessage(context.Background(), ref, proactiveHandler)
 	if err != nil {
 		t.logger.Error("Failed to send proactive message.", err)
-		return
+		turn.Err = err
+		return turn
 	}
 	t.logger.Info("Proactive message sent successfully.", fmt.Sprintf("%+v", turn.Message))
+	return turn
 }
 
 func (t *Teams) activityToTurn(turnCtx *activity.TurnContext) domain.Turn {
@@ -184,5 +218,17 @@ func (t *Teams) activityToTurn(turnCtx *activity.TurnContext) domain.Turn {
 			},
 		},
 		Err: err,
+	}
+}
+
+func (t *Teams) turnToSentChan(turn *domain.Turn) {
+	if t.sentChan == nil {
+		t.logger.Warn("wasn't able to send turn to sent channel", "channel is not set")
+		return
+	}
+	select {
+	case t.sentChan <- turn:
+	default:
+		t.logger.Warn("wasn't able to send turn to sent channel", "default")
 	}
 }

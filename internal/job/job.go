@@ -33,12 +33,12 @@ func (s *Service) SendProjectNotifications() {
 	}
 	go func() {
 		for {
+			time.Sleep(time.Duration(period) * time.Second)
 			if err := s.app.SendProjectNotifications(); err != nil {
 				s.logger.Error("failed to send project notifications", err)
 			} else {
 				s.logger.Info("sending project notification", "")
 			}
-			time.Sleep(time.Duration(period) * time.Second)
 		}
 	}()
 }

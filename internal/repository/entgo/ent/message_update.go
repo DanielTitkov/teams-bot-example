@@ -87,6 +87,26 @@ func (mu *MessageUpdate) SetProactive(b bool) *MessageUpdate {
 	return mu
 }
 
+// SetError sets the error field.
+func (mu *MessageUpdate) SetError(s string) *MessageUpdate {
+	mu.mutation.SetError(s)
+	return mu
+}
+
+// SetNillableError sets the error field if the given value is not nil.
+func (mu *MessageUpdate) SetNillableError(s *string) *MessageUpdate {
+	if s != nil {
+		mu.SetError(*s)
+	}
+	return mu
+}
+
+// ClearError clears the value of error.
+func (mu *MessageUpdate) ClearError() *MessageUpdate {
+	mu.mutation.ClearError()
+	return mu
+}
+
 // SetDialogID sets the dialog edge to Dialog by id.
 func (mu *MessageUpdate) SetDialogID(id int) *MessageUpdate {
 	mu.mutation.SetDialogID(id)
@@ -240,6 +260,19 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: message.FieldProactive,
 		})
 	}
+	if value, ok := mu.mutation.Error(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldError,
+		})
+	}
+	if mu.mutation.ErrorCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: message.FieldError,
+		})
+	}
 	if mu.mutation.DialogCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -348,6 +381,26 @@ func (muo *MessageUpdateOne) SetDirection(s string) *MessageUpdateOne {
 // SetProactive sets the proactive field.
 func (muo *MessageUpdateOne) SetProactive(b bool) *MessageUpdateOne {
 	muo.mutation.SetProactive(b)
+	return muo
+}
+
+// SetError sets the error field.
+func (muo *MessageUpdateOne) SetError(s string) *MessageUpdateOne {
+	muo.mutation.SetError(s)
+	return muo
+}
+
+// SetNillableError sets the error field if the given value is not nil.
+func (muo *MessageUpdateOne) SetNillableError(s *string) *MessageUpdateOne {
+	if s != nil {
+		muo.SetError(*s)
+	}
+	return muo
+}
+
+// ClearError clears the value of error.
+func (muo *MessageUpdateOne) ClearError() *MessageUpdateOne {
+	muo.mutation.ClearError()
 	return muo
 }
 
@@ -500,6 +553,19 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (m *Message, err error
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: message.FieldProactive,
+		})
+	}
+	if value, ok := muo.mutation.Error(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldError,
+		})
+	}
+	if muo.mutation.ErrorCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: message.FieldError,
 		})
 	}
 	if muo.mutation.DialogCleared() {

@@ -50,6 +50,7 @@ func main() {
 	t.SetOnInvokeHandler(app.HandleInvoke)
 	t.SetOnUpdateHandler(app.HandleUpdate)
 	t.SetProactiveChannel(app.ProactiveChan)
+	t.SetSentChannel(app.SentChan)
 
 	jobs := job.NewService(cfg, logger, app)
 	jobs.SendProjectNotifications() // TODO: maybe hide it inside jobs
@@ -76,6 +77,7 @@ func main() {
 	}()
 
 	go t.RunProactiveManager()
+	go app.ReadSentChannel()
 
 	logger.Fatal("failed to start teams service", t.Listen())
 

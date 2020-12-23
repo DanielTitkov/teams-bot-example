@@ -7,7 +7,7 @@ import (
 )
 
 func (a *App) StoreMessage(turn domain.Turn) error {
-	message, err := a.repo.CreateMessage(&turn.Message, turn.Dialog.Dialog) // TODO: make app method
+	message, err := a.repo.CreateMessage(&turn.Message, turn.Dialog.Dialog, turn.Err) // TODO: make app method
 	if err != nil {
 		return err
 	}

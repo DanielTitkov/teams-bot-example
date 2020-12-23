@@ -31,6 +31,8 @@ type Message struct {
 	Direction string `json:"direction,omitempty"`
 	// Proactive holds the value of the "proactive" field.
 	Proactive bool `json:"proactive,omitempty"`
+	// Error holds the value of the "error" field.
+	Error *string `json:"error,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MessageQuery when eager-loading is set.
 	Edges          MessageEdges `json:"edges"`
@@ -71,6 +73,7 @@ func (*Message) scanValues() []interface{} {
 		&sql.NullString{}, // system
 		&sql.NullString{}, // direction
 		&sql.NullBool{},   // proactive
+		&sql.NullString{}, // error
 	}
 }
 
@@ -128,7 +131,13 @@ func (m *Message) assignValues(values ...interface{}) error {
 	} else if value.Valid {
 		m.Proactive = value.Bool
 	}
-	values = values[7:]
+	if value, ok := values[7].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field error", values[7])
+	} else if value.Valid {
+		m.Error = new(string)
+		*m.Error = value.String
+	}
+	values = values[8:]
 	if len(values) == len(message.ForeignKeys) {
 		if value, ok := values[0].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field dialog_message", value)
@@ -182,6 +191,10 @@ func (m *Message) String() string {
 	builder.WriteString(m.Direction)
 	builder.WriteString(", proactive=")
 	builder.WriteString(fmt.Sprintf("%v", m.Proactive))
+	if v := m.Error; v != nil {
+		builder.WriteString(", error=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

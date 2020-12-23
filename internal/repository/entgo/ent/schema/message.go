@@ -20,6 +20,7 @@ func (Message) Fields() []ent.Field {
 		field.String("system"),
 		field.String("direction"),
 		field.Bool("proactive"),
+		field.String("error").Optional().Nillable(),
 	}
 }
 

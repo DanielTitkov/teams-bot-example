@@ -95,6 +95,20 @@ func (mc *MessageCreate) SetProactive(b bool) *MessageCreate {
 	return mc
 }
 
+// SetError sets the error field.
+func (mc *MessageCreate) SetError(s string) *MessageCreate {
+	mc.mutation.SetError(s)
+	return mc
+}
+
+// SetNillableError sets the error field if the given value is not nil.
+func (mc *MessageCreate) SetNillableError(s *string) *MessageCreate {
+	if s != nil {
+		mc.SetError(*s)
+	}
+	return mc
+}
+
 // SetDialogID sets the dialog edge to Dialog by id.
 func (mc *MessageCreate) SetDialogID(id int) *MessageCreate {
 	mc.mutation.SetDialogID(id)
@@ -255,6 +269,14 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 			Column: message.FieldProactive,
 		})
 		m.Proactive = value
+	}
+	if value, ok := mc.mutation.Error(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldError,
+		})
+		m.Error = &value
 	}
 	if nodes := mc.mutation.DialogIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

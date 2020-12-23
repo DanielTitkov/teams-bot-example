@@ -25,6 +25,8 @@ const (
 	FieldDirection = "direction"
 	// FieldProactive holds the string denoting the proactive field in the database.
 	FieldProactive = "proactive"
+	// FieldError holds the string denoting the error field in the database.
+	FieldError = "error"
 
 	// EdgeDialog holds the string denoting the dialog edge name in mutations.
 	EdgeDialog = "dialog"
@@ -50,6 +52,7 @@ var Columns = []string{
 	FieldSystem,
 	FieldDirection,
 	FieldProactive,
+	FieldError,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the Message type.

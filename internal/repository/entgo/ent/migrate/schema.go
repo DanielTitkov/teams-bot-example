@@ -41,6 +41,7 @@ var (
 		{Name: "system", Type: field.TypeString},
 		{Name: "direction", Type: field.TypeString},
 		{Name: "proactive", Type: field.TypeBool},
+		{Name: "error", Type: field.TypeString, Nullable: true},
 		{Name: "dialog_message", Type: field.TypeInt, Nullable: true},
 	}
 	// MessagesTable holds the schema information for the "messages" table.
@@ -51,7 +52,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:  "messages_dialogs_message",
-				Columns: []*schema.Column{MessagesColumns[8]},
+				Columns: []*schema.Column{MessagesColumns[9]},
 
 				RefColumns: []*schema.Column{DialogsColumns[0]},
 				OnDelete:   schema.SetNull,

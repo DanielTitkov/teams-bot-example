@@ -44,13 +44,6 @@ func (a *App) HandleMessage(turn domain.Turn) domain.Turn {
 		return turn
 	}
 
-	// store reply
-	err = a.StoreMessage(*reply)
-	if err != nil {
-		a.logger.Error("failed to store reply", err)
-		turn.Err = err
-	}
-
 	return *reply
 }
 
@@ -72,4 +65,13 @@ func (a *App) SendTeamsProactive(t *domain.Turn) error {
 	t.Message.Direction = OutputMessageCode
 	a.ProactiveChan <- t // TODO: maybe add timeout
 	return nil
+}
+
+func (a *App) ReadSentChannel() {
+	for {
+		select {
+		case turn := <-a.SentChan:
+			a.StoreMessage(*turn)
+		}
+	}
 }

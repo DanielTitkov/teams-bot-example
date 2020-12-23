@@ -18,6 +18,7 @@ type (
 		logger        *logger.Logger
 		repo          Repository
 		ProactiveChan chan *domain.Turn
+		SentChan      chan *domain.Turn
 	}
 	Repository interface {
 		// users
@@ -27,7 +28,7 @@ type (
 		GetUserCount() (int, error)
 
 		// messages
-		CreateMessage(*domain.Message, *domain.Dialog) (*domain.Message, error)
+		CreateMessage(*domain.Message, *domain.Dialog, error) (*domain.Message, error)
 
 		// dialog
 		CreateDialog(*domain.User, *domain.Dialog) (*domain.Dialog, error)
@@ -49,6 +50,7 @@ func NewApp(
 		cfg:           cfg,
 		logger:        logger,
 		repo:          repo,
-		ProactiveChan: make(chan *domain.Turn),
+		ProactiveChan: make(chan *domain.Turn, 100),
+		SentChan:      make(chan *domain.Turn, 100),
 	}
 }

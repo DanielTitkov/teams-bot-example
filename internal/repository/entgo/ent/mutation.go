@@ -605,6 +605,7 @@ type MessageMutation struct {
 	system        *string
 	direction     *string
 	proactive     *bool
+	error         *string
 	clearedFields map[string]struct{}
 	dialog        *int
 	cleareddialog bool
@@ -976,6 +977,56 @@ func (m *MessageMutation) ResetProactive() {
 	m.proactive = nil
 }
 
+// SetError sets the error field.
+func (m *MessageMutation) SetError(s string) {
+	m.error = &s
+}
+
+// Error returns the error value in the mutation.
+func (m *MessageMutation) Error() (r string, exists bool) {
+	v := m.error
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldError returns the old error value of the Message.
+// If the Message object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *MessageMutation) OldError(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldError is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldError requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldError: %w", err)
+	}
+	return oldValue.Error, nil
+}
+
+// ClearError clears the value of error.
+func (m *MessageMutation) ClearError() {
+	m.error = nil
+	m.clearedFields[message.FieldError] = struct{}{}
+}
+
+// ErrorCleared returns if the field error was cleared in this mutation.
+func (m *MessageMutation) ErrorCleared() bool {
+	_, ok := m.clearedFields[message.FieldError]
+	return ok
+}
+
+// ResetError reset all changes of the "error" field.
+func (m *MessageMutation) ResetError() {
+	m.error = nil
+	delete(m.clearedFields, message.FieldError)
+}
+
 // SetDialogID sets the dialog edge to Dialog by id.
 func (m *MessageMutation) SetDialogID(id int) {
 	m.dialog = &id
@@ -1029,7 +1080,7 @@ func (m *MessageMutation) Type() string {
 // this mutation. Note that, in order to get all numeric
 // fields that were in/decremented, call AddedFields().
 func (m *MessageMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.create_time != nil {
 		fields = append(fields, message.FieldCreateTime)
 	}
@@ -1050,6 +1101,9 @@ func (m *MessageMutation) Fields() []string {
 	}
 	if m.proactive != nil {
 		fields = append(fields, message.FieldProactive)
+	}
+	if m.error != nil {
+		fields = append(fields, message.FieldError)
 	}
 	return fields
 }
@@ -1073,6 +1127,8 @@ func (m *MessageMutation) Field(name string) (ent.Value, bool) {
 		return m.Direction()
 	case message.FieldProactive:
 		return m.Proactive()
+	case message.FieldError:
+		return m.Error()
 	}
 	return nil, false
 }
@@ -1096,6 +1152,8 @@ func (m *MessageMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldDirection(ctx)
 	case message.FieldProactive:
 		return m.OldProactive(ctx)
+	case message.FieldError:
+		return m.OldError(ctx)
 	}
 	return nil, fmt.Errorf("unknown Message field %s", name)
 }
@@ -1154,6 +1212,13 @@ func (m *MessageMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetProactive(v)
 		return nil
+	case message.FieldError:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetError(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Message field %s", name)
 }
@@ -1190,6 +1255,9 @@ func (m *MessageMutation) ClearedFields() []string {
 	if m.FieldCleared(message.FieldAttachment) {
 		fields = append(fields, message.FieldAttachment)
 	}
+	if m.FieldCleared(message.FieldError) {
+		fields = append(fields, message.FieldError)
+	}
 	return fields
 }
 
@@ -1209,6 +1277,9 @@ func (m *MessageMutation) ClearField(name string) error {
 		return nil
 	case message.FieldAttachment:
 		m.ClearAttachment()
+		return nil
+	case message.FieldError:
+		m.ClearError()
 		return nil
 	}
 	return fmt.Errorf("unknown Message nullable field %s", name)
@@ -1239,6 +1310,9 @@ func (m *MessageMutation) ResetField(name string) error {
 		return nil
 	case message.FieldProactive:
 		m.ResetProactive()
+		return nil
+	case message.FieldError:
+		m.ResetError()
 		return nil
 	}
 	return fmt.Errorf("unknown Message field %s", name)
