@@ -20,6 +20,7 @@ func (r *EntgoRepository) CreateMessage(m *domain.Message, d *domain.Dialog, tur
 		SetProactive(m.Proactive).
 		SetSystem(m.System).
 		SetDirection(m.Direction).
+		SetAttachment(m.Attachment).
 		SetNillableError(turnErrPtr).
 		Save(context.Background())
 
@@ -34,6 +35,10 @@ func (r *EntgoRepository) entToDomainMessage(m *ent.Message) *domain.Message {
 	return &domain.Message{
 		ID:         m.ID,
 		Text:       m.Text,
+		Proactive:  m.Proactive,
+		System:     m.System,
+		Direction:  m.Direction,
 		Attachment: m.Attachment,
+		// TODO: error
 	}
 }
