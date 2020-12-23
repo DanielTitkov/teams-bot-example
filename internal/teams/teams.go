@@ -26,7 +26,7 @@ const (
 type Teams struct {
 	adapter          core.Adapter
 	cfg              configs.Config
-	logger           *logger.Logger
+	logger           Logger
 	onMessageHandler func(domain.Turn) domain.Turn
 	onInvokeHandler  func(domain.Turn) domain.Turn
 	onUpdateHandler  func(domain.Turn) domain.Turn
