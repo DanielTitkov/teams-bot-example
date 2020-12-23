@@ -31,6 +31,7 @@ func (a *App) buildReply(turn *domain.Turn) (*domain.Turn, error) {
 func (a *App) defaultReply(turn *domain.Turn) (*domain.Turn, error) {
 	reply := makeOutputTurn(turn)
 	reply.Message.Text = defaultReplyText
+	reply.Message.Attachment = introCardJSON
 	return reply, nil
 }
 

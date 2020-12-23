@@ -90,7 +90,14 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 		OnMessageFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
 			response := t.onMessageHandler(t.activityToTurn(turnCtx))
 			turn = &response
-			return turnCtx.SendActivity(activity.MsgOptionText(response.Message.Text))
+
+			attachments, err := t.getAttachments(turn.Message.Attachment)
+			if err != nil {
+				turn.Err = err
+				return schema.Activity{}, err
+			}
+
+			return turnCtx.SendActivity(activity.MsgOptionText(response.Message.Text), activity.MsgOptionAttachments(attachments))
 		},
 		OnInvokeFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
 			response := t.onInvokeHandler(t.activityToTurn(turnCtx))
@@ -169,20 +176,16 @@ func (t *Teams) sendMessage(turn *domain.Turn) *domain.Turn {
 
 	var proactiveHandler = activity.HandlerFuncs{
 		OnMessageFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
-			// var obj map[string]interface{}
-			// err := json.Unmarshal([]byte(message.Attachment), &obj)
-			// if err != nil {
-			// 	return schema.Activity{}, err
-			// }
-			// attachments := []schema.Attachment{
-			// 	{
-			// 		ContentType: "application/vnd.microsoft.card.adaptive",
-			// 		Content:     obj,
-			// 	},
-			// }
+
+			attachments, err := t.getAttachments(turn.Message.Attachment)
+			if err != nil {
+				turn.Err = err
+				return schema.Activity{}, err
+			}
+
 			return turnCtx.SendActivity(
 				activity.MsgOptionText(turn.Message.Text),
-				// activity.MsgOptionAttachments(attachments),
+				activity.MsgOptionAttachments(attachments),
 			)
 		},
 	}
@@ -231,4 +234,22 @@ func (t *Teams) turnToSentChan(turn *domain.Turn) {
 	default:
 		t.logger.Warn("wasn't able to send turn to sent channel", "default")
 	}
+}
+
+func (t *Teams) getAttachments(rawAtt string) ([]schema.Attachment, error) {
+	var attachments []schema.Attachment
+	if rawAtt != "" {
+		var attachment map[string]interface{}
+		err := json.Unmarshal([]byte(rawAtt), &attachment)
+		if err != nil {
+			return attachments, err
+		}
+		attachments = []schema.Attachment{
+			{
+				ContentType: "application/vnd.microsoft.card.adaptive",
+				Content:     attachment,
+			},
+		}
+	}
+	return attachments, nil
 }
