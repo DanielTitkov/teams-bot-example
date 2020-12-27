@@ -46,3 +46,18 @@ func buildListProjectsFailedMessage(err error) string {
 func buildProjectNotificationText(title string, id int, minutes int64) string {
 	return fmt.Sprintf("До завершения проекта %s (ID: %d) осталось всего %d минут!", title, id, minutes)
 }
+
+func buildNoProjectsText() string {
+	return "У вас пока нет проектов"
+}
+
+func buildListProjectsHeader() string {
+	return "Ваши проекты:\n"
+}
+
+func buildListProjectsLine(idx, id int, title string, dueDate time.Time) string {
+	return fmt.Sprintf(
+		"%d) ID: %d, название: %s, дата завершения: %s\n",
+		idx, id, title, dueDate.Format(time.RubyDate),
+	)
+}
