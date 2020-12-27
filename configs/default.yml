@@ -6,7 +6,7 @@ server:
   port: 8000
   host: "0.0.0.0"
 auth:
-  exp: 72000 # hours
+  exp: 72 # hours
   secret: secret-key
 job: 
   sampleJobPeriod: 20 # seconds
