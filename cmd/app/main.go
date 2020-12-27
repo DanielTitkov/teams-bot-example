@@ -53,7 +53,7 @@ func main() {
 	jobs := job.NewService(cfg, logger, app)
 	jobs.SendProjectNotifications() // TODO: maybe hide it inside jobs
 
-	go t.RunProactiveManager()
+	// go t.RunProactiveManager()
 	go app.ReadSentChannel()
 
 	logger.Fatal("failed to start teams service", t.Listen())
