@@ -91,7 +91,6 @@ func (a *App) GetOrCreateTeamsUser(turn domain.Turn) (*domain.User, error) {
 			DisplayName:  *turn.User.Meta.Teams.Username,
 			Username:     generateUserLogin(*turn.User.Meta.Teams.Username),
 			PasswordHash: string(hash),
-			Email:        "sample@email.com", // FIXME
 			Meta: domain.UserMeta{
 				Teams: domain.UserMessagerData{
 					ID: turn.User.Meta.Teams.ID,

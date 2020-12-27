@@ -7,55 +7,55 @@ import (
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
 )
 
-func (a *App) HandleMessage(turn domain.Turn) (reply domain.Turn) {
-	reply = turn
-	defer func() { // capture eventual panic in business logic
-		if r := recover(); r != nil {
-			err := fmt.Errorf("panic occured during message processing: %s", r)
+func (a *App) HandleMessage(turn domain.Turn) (updatedTurn domain.Turn) {
+	updatedTurn = turn
+	defer func() {
+		var err error
+		if r := recover(); r != nil { // capture eventual panic in business logic
+			err = fmt.Errorf("panic occured during message processing: %s", r)
 			a.logger.Error("teams handle message paniced", err)
-			reply.Err = err
-			reply.Message.Text = buildBuildingReplyFailedMessage(reply.Err)
+			updatedTurn.Err = err
+		}
+		updatedTurn.Message.System = TeamsSystemCode
+		updatedTurn.Message.Direction = InputMessageCode
+		updatedTurn.Message.Proactive = false
+		if updatedTurn.Err != nil {
+			updatedTurn.Message.Text = buildBuildingReplyFailedMessage(updatedTurn.Err)
 		}
 	}()
-
-	reply.Message.System = TeamsSystemCode
-	reply.Message.Direction = InputMessageCode
-	reply.Message.Proactive = false
 
 	user, err := a.GetOrCreateTeamsUser(turn)
 	if err != nil {
 		a.logger.Error("failed to get or create user", err)
-		reply.Err = err
+		updatedTurn.Err = err
+		return updatedTurn
 	} else {
-		reply.User.User = user
+		updatedTurn.User.User = user
 	}
 
-	dialog, err := a.GetOrCreateTeamsUserDialog(turn)
+	dialog, err := a.GetOrCreateTeamsUserDialog(updatedTurn)
 	if err != nil {
 		a.logger.Error("failed to get or create dialog", err)
-		reply.Err = err
+		updatedTurn.Err = err
+		return updatedTurn
 	} else {
-		reply.Dialog.Dialog = dialog
+		updatedTurn.Dialog.Dialog = dialog
 	}
 
-	err = a.StoreMessage(turn)
+	err = a.StoreMessage(updatedTurn)
 	if err != nil {
 		a.logger.Error("failed to store message", err)
-		reply.Err = err
+		updatedTurn.Err = err
+		return updatedTurn
 	}
 
-	if turn.Err != nil {
-		reply.Message.Text = buildProcessingFailedMessage(turn.Err)
-		return reply
-	}
-
-	builtReply, err := a.buildReply(&turn)
+	reply, err := a.buildReply(&updatedTurn)
 	if err != nil {
-		reply.Message.Text = buildBuildingReplyFailedMessage(err)
-		return reply
+		updatedTurn.Message.Text = buildBuildingReplyFailedMessage(err)
+		return updatedTurn
 	}
-
-	return *builtReply
+	updatedTurn = *reply
+	return updatedTurn
 }
 
 func (a *App) HandleInvoke(turn domain.Turn) domain.Turn {

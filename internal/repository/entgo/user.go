@@ -37,7 +37,6 @@ func (r *EntgoRepository) CreateUser(u *domain.User) (*domain.User, error) {
 		Create().
 		SetUsername(u.Username).
 		SetDisplayName(u.DisplayName).
-		SetNillableEmail(&u.Email).
 		SetPasswordHash(u.PasswordHash).
 		SetNillableTeamsID(u.Meta.Teams.ID).
 		SetNillableTelegramID(u.Meta.Telegram.ID).
@@ -55,11 +54,16 @@ func (r *EntgoRepository) GetUserCount() (int, error) {
 }
 
 func entToDomainUser(user *ent.User) *domain.User {
+	var email string
+	if user.Email != nil {
+		email = *user.Email
+	}
+
 	return &domain.User{
 		ID:           user.ID,
 		Username:     user.Username,
 		DisplayName:  user.DisplayName,
-		Email:        *user.Email,
+		Email:        email,
 		PasswordHash: user.PasswordHash,
 		Meta: domain.UserMeta{
 			Teams: domain.UserMessagerData{
