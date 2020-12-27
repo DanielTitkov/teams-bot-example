@@ -26,7 +26,7 @@ type User struct {
 	// DisplayName holds the value of the "display_name" field.
 	DisplayName string `json:"display_name,omitempty"`
 	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
+	Email *string `json:"email,omitempty"`
 	// PasswordHash holds the value of the "password_hash" field.
 	PasswordHash string `json:"password_hash,omitempty"`
 	// Service holds the value of the "service" field.
@@ -128,7 +128,8 @@ func (u *User) assignValues(values ...interface{}) error {
 	if value, ok := values[4].(*sql.NullString); !ok {
 		return fmt.Errorf("unexpected type %T for field email", values[4])
 	} else if value.Valid {
-		u.Email = value.String
+		u.Email = new(string)
+		*u.Email = value.String
 	}
 	if value, ok := values[5].(*sql.NullString); !ok {
 		return fmt.Errorf("unexpected type %T for field password_hash", values[5])
@@ -202,8 +203,10 @@ func (u *User) String() string {
 	builder.WriteString(u.Username)
 	builder.WriteString(", display_name=")
 	builder.WriteString(u.DisplayName)
-	builder.WriteString(", email=")
-	builder.WriteString(u.Email)
+	if v := u.Email; v != nil {
+		builder.WriteString(", email=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", password_hash=")
 	builder.WriteString(u.PasswordHash)
 	builder.WriteString(", service=")

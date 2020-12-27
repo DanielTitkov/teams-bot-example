@@ -2,49 +2,60 @@ package app
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
 )
 
-func (a *App) HandleMessage(turn domain.Turn) domain.Turn {
-	turn.Message.System = TeamsSystemCode
-	turn.Message.Direction = InputMessageCode
-	turn.Message.Proactive = false
+func (a *App) HandleMessage(turn domain.Turn) (reply domain.Turn) {
+	reply = turn
+	defer func() { // capture eventual panic in business logic
+		if r := recover(); r != nil {
+			err := fmt.Errorf("panic occured during message processing: %s", r)
+			a.logger.Error("teams handle message paniced", err)
+			reply.Err = err
+			reply.Message.Text = buildBuildingReplyFailedMessage(reply.Err)
+		}
+	}()
+
+	reply.Message.System = TeamsSystemCode
+	reply.Message.Direction = InputMessageCode
+	reply.Message.Proactive = false
 
 	user, err := a.GetOrCreateTeamsUser(turn)
 	if err != nil {
 		a.logger.Error("failed to get or create user", err)
-		turn.Err = err
+		reply.Err = err
 	} else {
-		turn.User.User = user
+		reply.User.User = user
 	}
 
 	dialog, err := a.GetOrCreateTeamsUserDialog(turn)
 	if err != nil {
 		a.logger.Error("failed to get or create dialog", err)
-		turn.Err = err
+		reply.Err = err
 	} else {
-		turn.Dialog.Dialog = dialog
+		reply.Dialog.Dialog = dialog
 	}
 
 	err = a.StoreMessage(turn)
 	if err != nil {
 		a.logger.Error("failed to store message", err)
-		turn.Err = err
+		reply.Err = err
 	}
 
 	if turn.Err != nil {
-		turn.Message.Text = buildProcessingFailedMessage(turn.Err)
-		return turn
+		reply.Message.Text = buildProcessingFailedMessage(turn.Err)
+		return reply
 	}
 
-	reply, err := a.buildReply(&turn)
+	builtReply, err := a.buildReply(&turn)
 	if err != nil {
-		turn.Message.Text = buildBuildingReplyFailedMessage(err)
-		return turn
+		reply.Message.Text = buildBuildingReplyFailedMessage(err)
+		return reply
 	}
 
-	return *reply
+	return *builtReply
 }
 
 func (a *App) HandleInvoke(turn domain.Turn) domain.Turn {
@@ -71,7 +82,10 @@ func (a *App) ReadSentChannel() {
 	for {
 		select {
 		case turn := <-a.SentChan:
-			a.StoreMessage(*turn)
+			err := a.StoreMessage(*turn)
+			if err != nil {
+				a.logger.Error("failed to store message", err)
+			}
 		}
 	}
 }

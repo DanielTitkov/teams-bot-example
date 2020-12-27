@@ -90,7 +90,6 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 		OnMessageFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
 			response := t.onMessageHandler(t.activityToTurn(turnCtx))
 			turn = &response
-
 			attachments, err := t.getAttachments(turn.Message.Attachment)
 			if err != nil {
 				turn.Err = err

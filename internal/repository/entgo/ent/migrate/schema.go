@@ -90,7 +90,7 @@ var (
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "display_name", Type: field.TypeString, Nullable: true},
-		{Name: "email", Type: field.TypeString, Unique: true},
+		{Name: "email", Type: field.TypeString, Unique: true, Nullable: true},
 		{Name: "password_hash", Type: field.TypeString},
 		{Name: "service", Type: field.TypeBool},
 		{Name: "teams_id", Type: field.TypeString, Unique: true, Nullable: true},
