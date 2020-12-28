@@ -22,25 +22,32 @@ const (
 	inputCode  = "input"
 )
 
-// Teams handles the HTTP requests from then connector service
-type Teams struct {
-	adapter          core.Adapter
-	cfg              configs.Config
-	logger           Logger
-	onMessageHandler func(domain.Turn) domain.Turn
-	onInvokeHandler  func(domain.Turn) domain.Turn
-	onUpdateHandler  func(domain.Turn) domain.Turn
-	proactiveChan    <-chan *domain.Turn
-	sentChan         chan<- *domain.Turn
-}
+type (
+	// Teams handles the HTTP requests from then connector service
+	Teams struct {
+		adapter          core.Adapter
+		cfg              configs.Config
+		logger           Logger
+		onMessageHandler func(domain.Turn) domain.Turn
+		onInvokeHandler  func(domain.Turn) domain.Turn
+		onUpdateHandler  func(domain.Turn) domain.Turn
+		proactiveChan    <-chan *domain.Turn
+		sentChan         chan<- *domain.Turn
+	}
+	// Config holds data to create teams connector
+	Config struct {
+		AppID       string
+		AppPassword string
+	}
+)
 
 func NewTeams(
-	cfg configs.Config,
 	logger *logger.Logger,
+	cfg Config,
 ) *Teams {
 	setting := core.AdapterSetting{
-		AppID:       cfg.Teams.AppID,
-		AppPassword: cfg.Teams.AppPassword,
+		AppID:       cfg.AppID,
+		AppPassword: cfg.AppPassword,
 	}
 
 	adapter, err := core.NewBotAdapter(setting)
@@ -50,7 +57,6 @@ func NewTeams(
 
 	return &Teams{
 		adapter: adapter,
-		cfg:     cfg,
 		logger:  logger,
 	}
 }
@@ -128,24 +134,20 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 	t.logger.Info("request processed successfully", "")
 }
 
-func (t *Teams) Listen() error {
+func (t *Teams) GetHandler() (func(w http.ResponseWriter, req *http.Request), error) {
 	if t.onMessageHandler == nil {
-		return errors.New("message handler required")
+		return nil, errors.New("message handler required")
 	}
 
 	if t.onInvokeHandler == nil {
-		return errors.New("invoke handler required")
+		return nil, errors.New("invoke handler required")
 	}
 
 	if t.onUpdateHandler == nil {
-		return errors.New("update handler required")
+		return nil, errors.New("update handler required")
 	}
 
-	http.HandleFunc("/api/messages", t.processMessage)
-	port := fmt.Sprintf(":%d", t.cfg.Teams.Port)
-	t.logger.Info("Listening for teams messages", "port "+port)
-	http.ListenAndServe(port, nil)
-	return nil
+	return t.processMessage, nil
 }
 
 func (t *Teams) RunProactiveManager() {
