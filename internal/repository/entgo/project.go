@@ -55,6 +55,9 @@ func (r *EntgoRepository) GetRandomProjectByUser() ([]*domain.Project, error) {
 	for _, u := range users {
 		projects := u.Edges.Projects
 		rnd := rand.New(rand.NewSource(time.Now().Unix()))
+		if len(projects) < 1 {
+			continue
+		}
 		project := projects[rnd.Intn(len(projects))]
 		res = append(res, r.entToDomainProject(&domain.User{Username: u.Username}, project))
 	}

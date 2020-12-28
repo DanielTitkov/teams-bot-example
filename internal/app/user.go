@@ -75,6 +75,9 @@ func (a *App) GetUserToken(u *domain.User) (string, error) {
 func generateUserLogin(name string) string {
 	reg := regexp.MustCompile(`[^\w]+`)
 	login := reg.ReplaceAllString(name, "")
+	if login == "" {
+		login = "user"
+	}
 	return strings.ToLower(login) + fmt.Sprint(time.Now().Nanosecond())
 }
 

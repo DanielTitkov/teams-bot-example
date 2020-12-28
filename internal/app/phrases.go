@@ -11,8 +11,8 @@ const (
 	defaultDateTimeLayout = "02.01.2006"
 )
 
-var createProjectRequest = regexp.MustCompile(`^Создать проект [\w\p{L}-]+ [\w\d]+\s*`)
-var listProjiectsRequest = regexp.MustCompile(`^Мои проекты\s*`)
+var createProjectRequest = regexp.MustCompile(`^\s*Создать проект [\w\p{L}-]+ [\w\d]+\s*`)
+var listProjiectsRequest = regexp.MustCompile(`^\s*Мои проекты\s*`)
 
 func buildUserCreatedMessage(displayName, login string) string {
 	return fmt.Sprintf("Создан новый пользователь: %s. Сгенерированный логин: '%s'.", displayName, login)
