@@ -4,9 +4,10 @@ import (
 	"fmt"
 
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
+	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
 )
 
-func (a *App) GetOrCreateTeamsUserDialog(turn domain.Turn) (*domain.Dialog, error) {
+func (a *App) GetOrCreateTeamsUserDialog(turn mesga.Turn) (*domain.Dialog, error) {
 	dialog, err := a.repo.GetUserDialog(turn.User.User)
 	if err != nil {
 		dialog, err = a.repo.CreateDialog(turn.User.User, &domain.Dialog{

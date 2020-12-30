@@ -1,4 +1,4 @@
-package teams
+package mesga
 
 import (
 	"context"
@@ -9,8 +9,6 @@ import (
 	"net/http"
 
 	"github.com/DanielTitkov/teams-bot-example/internal/configs"
-	"github.com/DanielTitkov/teams-bot-example/internal/domain"
-	"github.com/DanielTitkov/teams-bot-example/internal/logger"
 	"github.com/infracloudio/msbotbuilder-go/core"
 	"github.com/infracloudio/msbotbuilder-go/core/activity"
 	"github.com/infracloudio/msbotbuilder-go/schema"
@@ -28,22 +26,25 @@ type (
 		adapter          core.Adapter
 		cfg              configs.Config
 		logger           Logger
-		onMessageHandler func(domain.Turn) domain.Turn
-		onInvokeHandler  func(domain.Turn) domain.Turn
-		onUpdateHandler  func(domain.Turn) domain.Turn
-		proactiveChan    <-chan *domain.Turn
-		sentChan         chan<- *domain.Turn
+		onMessageHandler func(Turn) Turn
+		onInvokeHandler  func(Turn) Turn
+		onUpdateHandler  func(Turn) Turn
+		sentChan         chan<- *Turn
 	}
-	// Config holds data to create teams connector
-	Config struct {
-		AppID       string
-		AppPassword string
+	// TeamsConfig holds data to create teams connector
+	TeamsConfig struct {
+		AppID            string          // AppID from Azure
+		AppPassword      string          // AppPassword from Azure
+		OnMessageHandler func(Turn) Turn // OnMessageHandler to process message activity
+		OnInvokeHandler  func(Turn) Turn // OnInvokeHandler to process invoke activity
+		OnUpdateHandler  func(Turn) Turn // OnUpdateHandler to process update activity
+		sentChan         chan *Turn      // set automatically by manager
 	}
 )
 
-func NewTeams(
-	logger *logger.Logger,
-	cfg Config,
+func newTeams(
+	logger Logger,
+	cfg TeamsConfig,
 ) *Teams {
 	setting := core.AdapterSetting{
 		AppID:       cfg.AppID,
@@ -56,34 +57,17 @@ func NewTeams(
 	}
 
 	return &Teams{
-		adapter: adapter,
-		logger:  logger,
+		adapter:          adapter,
+		logger:           logger,
+		onMessageHandler: cfg.OnMessageHandler,
+		onInvokeHandler:  cfg.OnInvokeHandler,
+		onUpdateHandler:  cfg.OnUpdateHandler,
 	}
-}
-
-func (t *Teams) SetOnMessageHandler(handler func(domain.Turn) domain.Turn) {
-	t.onMessageHandler = handler
-}
-
-func (t *Teams) SetOnInvokeHandler(handler func(domain.Turn) domain.Turn) {
-	t.onInvokeHandler = handler
-}
-
-func (t *Teams) SetOnUpdateHandler(handler func(domain.Turn) domain.Turn) {
-	t.onUpdateHandler = handler
-}
-
-func (t *Teams) SetProactiveChannel(ch chan *domain.Turn) {
-	t.proactiveChan = ch
-}
-
-func (t *Teams) SetSentChannel(ch chan *domain.Turn) {
-	t.sentChan = ch
 }
 
 func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
-	var turn *domain.Turn
+	var turn *Turn
 
 	defer func() {
 		turn.Message.Direction = ouputCode
@@ -134,7 +118,7 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 	t.logger.Info("request processed successfully", "")
 }
 
-func (t *Teams) GetHandler() (func(w http.ResponseWriter, req *http.Request), error) {
+func (t *Teams) getHandler() (func(w http.ResponseWriter, req *http.Request), error) {
 	if t.onMessageHandler == nil {
 		return nil, errors.New("message handler required")
 	}
@@ -150,16 +134,7 @@ func (t *Teams) GetHandler() (func(w http.ResponseWriter, req *http.Request), er
 	return t.processMessage, nil
 }
 
-func (t *Teams) RunProactiveManager() {
-	for {
-		select {
-		case message := <-t.proactiveChan:
-			t.sendMessage(message)
-		}
-	}
-}
-
-func (t *Teams) sendMessage(turn *domain.Turn) *domain.Turn {
+func (t *Teams) sendMessage(turn *Turn) *Turn {
 	defer func() {
 		turn.Message.Direction = ouputCode
 		turn.Message.System = systemCode
@@ -201,21 +176,21 @@ func (t *Teams) sendMessage(turn *domain.Turn) *domain.Turn {
 	return turn
 }
 
-func (t *Teams) activityToTurn(turnCtx *activity.TurnContext) domain.Turn {
+func (t *Teams) activityToTurn(turnCtx *activity.TurnContext) Turn {
 	conversationRef := activity.GetCoversationReference(turnCtx.Activity)
 	jsonRef, err := json.Marshal(conversationRef)
-	return domain.Turn{
-		Message: domain.Message{
+	return Turn{
+		Message: Message{
 			Text: turnCtx.Activity.Text,
 		},
-		Dialog: domain.TurnDialog{
-			Meta: domain.DialogMeta{
+		Dialog: TurnDialog{
+			Meta: DialogMeta{
 				Teams: string(jsonRef),
 			},
 		},
-		User: domain.TurnUser{
-			Meta: domain.UserMeta{
-				Teams: domain.UserMessagerData{
+		User: TurnUser{
+			Meta: UserMeta{
+				Teams: UserMessagerData{
 					ID:       &conversationRef.User.ID,
 					Username: &conversationRef.User.Name,
 				},
@@ -225,7 +200,7 @@ func (t *Teams) activityToTurn(turnCtx *activity.TurnContext) domain.Turn {
 	}
 }
 
-func (t *Teams) turnToSentChan(turn *domain.Turn) {
+func (t *Teams) turnToSentChan(turn *Turn) {
 	if t.sentChan == nil {
 		t.logger.Warn("wasn't able to send turn to sent channel", "channel is not set")
 		return

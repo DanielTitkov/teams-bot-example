@@ -9,11 +9,12 @@ import (
 	"time"
 
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
+	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
 )
 
-var replyMapping = map[string]func(*domain.Turn) (*domain.Turn, error){}
+var replyMapping = map[string]func(*mesga.Turn) (*mesga.Turn, error){}
 
-func (a *App) buildReply(turn *domain.Turn) (*domain.Turn, error) {
+func (a *App) buildReply(turn *mesga.Turn) (*mesga.Turn, error) {
 	turn.Message.Direction = OutputMessageCode
 	text := turn.Message.Text
 
@@ -27,14 +28,14 @@ func (a *App) buildReply(turn *domain.Turn) (*domain.Turn, error) {
 	}
 }
 
-func (a *App) defaultReply(turn *domain.Turn) (*domain.Turn, error) {
+func (a *App) defaultReply(turn *mesga.Turn) (*mesga.Turn, error) {
 	reply := makeOutputTurn(turn)
 	reply.Message.Text = defaultReplyText
 	reply.Message.Attachment = introCardJSON
 	return reply, nil
 }
 
-func (a *App) createProjectReply(turn *domain.Turn) (*domain.Turn, error) {
+func (a *App) createProjectReply(turn *mesga.Turn) (*mesga.Turn, error) {
 	reply := makeOutputTurn(turn)
 
 	tokens := strings.Split(turn.Message.Text, " ")
@@ -60,7 +61,7 @@ func (a *App) createProjectReply(turn *domain.Turn) (*domain.Turn, error) {
 	return reply, nil
 }
 
-func (a *App) listProjectsReply(turn *domain.Turn) (*domain.Turn, error) {
+func (a *App) listProjectsReply(turn *mesga.Turn) (*mesga.Turn, error) {
 	reply := makeOutputTurn(turn)
 	projects, err := a.GetUserProjects(turn)
 	if err != nil {
@@ -83,8 +84,8 @@ func matchWithRegexp(text string, reg *regexp.Regexp) bool {
 	return reg.Match([]byte(text))
 }
 
-func makeOutputTurn(turn *domain.Turn) *domain.Turn {
-	return &domain.Turn{
+func makeOutputTurn(turn *mesga.Turn) *mesga.Turn {
+	return &mesga.Turn{
 		Message: domain.Message{
 			Direction: OutputMessageCode,
 			System:    turn.Message.System,

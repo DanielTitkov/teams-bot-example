@@ -4,9 +4,10 @@ import (
 	"time"
 
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
+	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
 )
 
-func (a *App) CreateProject(t *domain.Turn, p *domain.Project) (*domain.Project, error) {
+func (a *App) CreateProject(t *mesga.Turn, p *domain.Project) (*domain.Project, error) {
 	project, err := a.repo.CreateProject(t.User.User, p)
 	if err != nil {
 		return nil, err
@@ -14,7 +15,7 @@ func (a *App) CreateProject(t *domain.Turn, p *domain.Project) (*domain.Project,
 	return project, nil
 }
 
-func (a *App) GetUserProjects(t *domain.Turn) ([]*domain.Project, error) { // TODO: think of signature
+func (a *App) GetUserProjects(t *mesga.Turn) ([]*domain.Project, error) { // TODO: think of signature
 	projects, err := a.repo.GetUserProjects(t.User.User)
 	if err != nil {
 		return nil, err
@@ -35,8 +36,8 @@ func (a *App) SendProjectNotifications() error {
 			return err
 		}
 
-		err = a.SendTeamsProactive(&domain.Turn{
-			Dialog: domain.TurnDialog{
+		err = a.SendTeamsProactive(&mesga.Turn{
+			Dialog: mesga.TurnDialog{
 				Dialog: dialog,
 				Meta:   dialog.Meta,
 			},

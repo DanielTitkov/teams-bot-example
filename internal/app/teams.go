@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/DanielTitkov/teams-bot-example/internal/domain"
+	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
 )
 
-func (a *App) HandleMessage(turn domain.Turn) (updatedTurn domain.Turn) {
+func (a *App) HandleMessage(turn mesga.Turn) (updatedTurn mesga.Turn) {
 	updatedTurn = turn
 	defer func() {
 		var err error
@@ -58,22 +58,23 @@ func (a *App) HandleMessage(turn domain.Turn) (updatedTurn domain.Turn) {
 	return updatedTurn
 }
 
-func (a *App) HandleInvoke(turn domain.Turn) domain.Turn {
+func (a *App) HandleInvoke(turn mesga.Turn) mesga.Turn {
 	turn.Message.Text = "INVOKE"
 	return turn
 }
 
-func (a *App) HandleUpdate(turn domain.Turn) domain.Turn {
+func (a *App) HandleUpdate(turn mesga.Turn) mesga.Turn {
 	turn.Message.Text = "UPDATE"
 	return turn
 }
 
-func (a *App) SendTeamsProactive(t *domain.Turn) error {
+func (a *App) SendTeamsProactive(t *mesga.Turn) error {
 	if t.Dialog.Meta.Teams == "" {
 		return errors.New("teams dialog reference is required to send proactive turn")
 	}
 	t.Message.Proactive = true
 	t.Message.Direction = OutputMessageCode
+	t.System = mesga.TeamsCode
 	a.ProactiveChan <- t // TODO: maybe add timeout
 	return nil
 }

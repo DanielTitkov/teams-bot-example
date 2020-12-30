@@ -12,7 +12,8 @@ import (
 	"github.com/DanielTitkov/teams-bot-example/internal/logger"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo"
 	"github.com/DanielTitkov/teams-bot-example/internal/repository/entgo/ent"
-	"github.com/DanielTitkov/teams-bot-example/internal/teams"
+	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
+
 	_ "github.com/lib/pq"
 )
 
@@ -44,24 +45,31 @@ func main() {
 
 	app := app.NewApp(cfg, logger, repo)
 
-	t := teams.NewTeams(logger, teams.Config{
-		AppID:       cfg.Teams.AppID,
-		AppPassword: cfg.Teams.AppPassword,
-	})
-
-	t.SetOnMessageHandler(app.HandleMessage)
-	t.SetOnInvokeHandler(app.HandleInvoke)
-	t.SetOnUpdateHandler(app.HandleUpdate)
-	t.SetProactiveChannel(app.ProactiveChan)
-	t.SetSentChannel(app.SentChan)
-
 	jobs := job.NewService(cfg, logger, app)
 	jobs.SendProjectNotifications() // TODO: maybe hide it inside jobs
 
-	go t.RunProactiveManager()
 	go app.ReadSentChannel()
 
-	teamsHandler, err := t.GetHandler()
+	m := mesga.New(logger, mesga.Config{
+		Teams: mesga.TeamsConfig{
+			AppID:            cfg.Teams.AppID,
+			AppPassword:      cfg.Teams.AppPassword,
+			OnMessageHandler: app.HandleMessage,
+			OnInvokeHandler:  app.HandleInvoke,
+			OnUpdateHandler:  app.HandleUpdate,
+		},
+		ProactiveChan: app.ProactiveChan,
+		SentChan:      app.SentChan,
+	})
+
+	err = m.RunProactiveListener()
+	if err != nil {
+		logger.Fatal("failed to start mesga proactive listener", err)
+	}
+
+	logger.Info("init mesga", fmt.Sprint(m))
+
+	teamsHandler, err := m.GetTeamsHandler()
 	if err != nil {
 		logger.Fatal("failed to get teams handler", err)
 	}
