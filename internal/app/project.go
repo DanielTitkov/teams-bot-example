@@ -4,18 +4,19 @@ import (
 	"time"
 
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
+	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
 )
 
-func (a *App) CreateProject(t *domain.Turn, p *domain.Project) (*domain.Project, error) {
-	project, err := a.repo.CreateProject(t.User.User, p)
+func (a *App) CreateProject(u *domain.User, p *domain.Project) (*domain.Project, error) {
+	project, err := a.repo.CreateProject(u, p)
 	if err != nil {
 		return nil, err
 	}
 	return project, nil
 }
 
-func (a *App) GetUserProjects(t *domain.Turn) ([]*domain.Project, error) { // TODO: think of signature
-	projects, err := a.repo.GetUserProjects(t.User.User)
+func (a *App) GetUserProjects(u *domain.User) ([]*domain.Project, error) { // TODO: think of signature
+	projects, err := a.repo.GetUserProjects(u)
 	if err != nil {
 		return nil, err
 	}
@@ -30,21 +31,31 @@ func (a *App) SendProjectNotifications() error {
 		return err
 	}
 	for _, p := range projects {
+		user, err := a.repo.GetUserByUsername(p.User)
+		if err != nil {
+			return err
+		}
+
 		dialog, err := a.repo.GetUserDialog(&domain.User{Username: p.User})
 		if err != nil {
 			return err
 		}
 
-		err = a.SendTeamsProactive(&domain.Turn{
-			Dialog: domain.TurnDialog{
-				Dialog: dialog,
-				Meta:   dialog.Meta,
+		err = a.SendTeamsProactive(&mesga.Turn{
+			System: mesga.TeamsCode,
+			User: &mesga.User{
+				Teams: mesga.UserMessagerData{
+					ID: user.Meta.Teams.ID,
+				},
 			},
-			Message: domain.Message{
+			Dialog: &mesga.Dialog{
+				Teams: dialog.Meta.Teams,
+			},
+			Message: mesga.Message{
 				Text: buildProjectNotificationText(
 					p.Title,
 					p.ID,
-					minutesFormNow(p.DueDate),
+					minutesFromNow(p.DueDate),
 				),
 			},
 		})
@@ -55,7 +66,7 @@ func (a *App) SendProjectNotifications() error {
 	return nil
 }
 
-func minutesFormNow(t time.Time) int64 {
+func minutesFromNow(t time.Time) int64 {
 	now := time.Now()
 	diff := now.Sub(t)
 	return int64(diff.Minutes()) * -1

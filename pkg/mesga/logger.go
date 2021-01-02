@@ -1,4 +1,4 @@
-package teams
+package mesga
 
 // Logger is a general logger interface for teams
 type Logger interface {

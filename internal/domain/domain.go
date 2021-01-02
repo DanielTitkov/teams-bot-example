@@ -25,23 +25,6 @@ type (
 		Direction  string
 		Proactive  bool
 	}
-	// Turn container strores all recieved data
-	Turn struct {
-		Message Message
-		Dialog  TurnDialog // used for callbacks, not stored
-		User    TurnUser   // TODO: think about it
-		Err     error
-	}
-	// TurnUser hodls dialog data for message processor
-	TurnUser struct {
-		User *User
-		Meta UserMeta
-	}
-	// TurnDialog hodls dialog data for message processor
-	TurnDialog struct {
-		Dialog *Dialog
-		Meta   DialogMeta
-	}
 	// UserMeta stores users data for messagers
 	UserMeta struct {
 		Teams    UserMessagerData
@@ -65,9 +48,7 @@ type (
 		Telegram string // for example
 		Slack    string // for example
 	}
-	// Business logic
-	// not linked to messenges staff
-	// Project
+	// Project holds project data
 	Project struct {
 		ID      int
 		User    string

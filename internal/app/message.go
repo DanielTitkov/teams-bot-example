@@ -4,10 +4,13 @@ import (
 	"fmt"
 
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
+	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
 )
 
-func (a *App) StoreMessage(turn domain.Turn) error {
-	message, err := a.repo.CreateMessage(&turn.Message, turn.Dialog.Dialog, turn.Err) // TODO: make app method
+func (a *App) StoreMessage(turn mesga.Turn, dialog *domain.Dialog) error {
+	m := mesgaToDomainMessage(turn.Message)
+	m.System = turn.System
+	message, err := a.repo.CreateMessage(&m, dialog, turn.Err) // TODO: make app method
 	if err != nil {
 		return err
 	}

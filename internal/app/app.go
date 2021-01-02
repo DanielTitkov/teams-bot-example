@@ -4,6 +4,7 @@ import (
 	"github.com/DanielTitkov/teams-bot-example/internal/configs"
 	"github.com/DanielTitkov/teams-bot-example/internal/domain"
 	"github.com/DanielTitkov/teams-bot-example/internal/logger"
+	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
 )
 
 const (
@@ -17,8 +18,8 @@ type (
 		cfg           configs.Config
 		logger        *logger.Logger
 		repo          Repository
-		ProactiveChan chan *domain.Turn
-		SentChan      chan *domain.Turn
+		ProactiveChan chan *mesga.Turn
+		SentChan      chan *mesga.Turn
 	}
 	Repository interface {
 		// users
@@ -50,7 +51,7 @@ func NewApp(
 		cfg:           cfg,
 		logger:        logger,
 		repo:          repo,
-		ProactiveChan: make(chan *domain.Turn, 100),
-		SentChan:      make(chan *domain.Turn, 100),
+		ProactiveChan: make(chan *mesga.Turn, 100),
+		SentChan:      make(chan *mesga.Turn, 100),
 	}
 }
