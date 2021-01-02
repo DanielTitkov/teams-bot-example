@@ -14,12 +14,6 @@ import (
 	"github.com/infracloudio/msbotbuilder-go/schema"
 )
 
-const (
-	systemCode = "teams"
-	ouputCode  = "output"
-	inputCode  = "input"
-)
-
 type (
 	// Teams handles the HTTP requests from then connector service
 	Teams struct {
@@ -70,9 +64,9 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 	var turn *Turn
 
 	defer func() {
-		turn.Message.Direction = ouputCode
-		turn.Message.System = systemCode
+		turn.Message.Direction = OutputCode
 		turn.Message.Proactive = false
+		turn.System = TeamsCode
 		t.turnToSentChan(turn)
 	}()
 
@@ -136,14 +130,14 @@ func (t *Teams) getHandler() (func(w http.ResponseWriter, req *http.Request), er
 
 func (t *Teams) sendMessage(turn *Turn) *Turn {
 	defer func() {
-		turn.Message.Direction = ouputCode
-		turn.Message.System = systemCode
+		turn.System = TeamsCode
+		turn.Message.Direction = OutputCode
 		turn.Message.Proactive = true
 		t.turnToSentChan(turn)
 	}()
 
 	var ref schema.ConversationReference
-	err := json.Unmarshal([]byte(turn.Dialog.Meta.Teams), &ref)
+	err := json.Unmarshal([]byte(turn.Dialog.Teams), &ref)
 	if err != nil {
 		t.logger.Error("failed to unmarshal conversation reference", err)
 		turn.Err = err
@@ -181,22 +175,20 @@ func (t *Teams) activityToTurn(turnCtx *activity.TurnContext) Turn {
 	jsonRef, err := json.Marshal(conversationRef)
 	return Turn{
 		Message: Message{
-			Text: turnCtx.Activity.Text,
+			Text:      turnCtx.Activity.Text,
+			Direction: InputCode,
 		},
-		Dialog: TurnDialog{
-			Meta: DialogMeta{
-				Teams: string(jsonRef),
+		Dialog: &Dialog{
+			Teams: string(jsonRef),
+		},
+		User: &User{
+			Teams: UserMessagerData{
+				ID:       &conversationRef.User.ID,
+				Username: &conversationRef.User.Name,
 			},
 		},
-		User: TurnUser{
-			Meta: UserMeta{
-				Teams: UserMessagerData{
-					ID:       &conversationRef.User.ID,
-					Username: &conversationRef.User.Name,
-				},
-			},
-		},
-		Err: err,
+		System: TeamsCode,
+		Err:    err,
 	}
 }
 

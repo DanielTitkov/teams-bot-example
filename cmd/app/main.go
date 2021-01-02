@@ -62,12 +62,7 @@ func main() {
 		SentChan:      app.SentChan,
 	})
 
-	err = m.RunProactiveListener()
-	if err != nil {
-		logger.Fatal("failed to start mesga proactive listener", err)
-	}
-
-	logger.Info("init mesga", fmt.Sprint(m))
+	go m.RunProactiveListener()
 
 	teamsHandler, err := m.GetTeamsHandler()
 	if err != nil {

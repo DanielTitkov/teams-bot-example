@@ -12,30 +12,40 @@ import (
 	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
 )
 
-var replyMapping = map[string]func(*mesga.Turn) (*mesga.Turn, error){}
-
-func (a *App) buildReply(turn *mesga.Turn) (*mesga.Turn, error) {
+func (a *App) buildReply(
+	turn *mesga.Turn,
+	user *domain.User,
+	dialog *domain.Dialog,
+) (*mesga.Turn, error) {
 	turn.Message.Direction = OutputMessageCode
 	text := turn.Message.Text
 
 	switch {
 	case matchWithRegexp(text, createProjectRequest):
-		return a.createProjectReply(turn)
+		return a.createProjectReply(turn, user, dialog)
 	case matchWithRegexp(text, listProjiectsRequest):
-		return a.listProjectsReply(turn)
+		return a.listProjectsReply(turn, user, dialog)
 	default:
-		return a.defaultReply(turn)
+		return a.defaultReply(turn, user, dialog)
 	}
 }
 
-func (a *App) defaultReply(turn *mesga.Turn) (*mesga.Turn, error) {
+func (a *App) defaultReply(
+	turn *mesga.Turn,
+	user *domain.User,
+	dialog *domain.Dialog,
+) (*mesga.Turn, error) {
 	reply := makeOutputTurn(turn)
 	reply.Message.Text = defaultReplyText
 	reply.Message.Attachment = introCardJSON
 	return reply, nil
 }
 
-func (a *App) createProjectReply(turn *mesga.Turn) (*mesga.Turn, error) {
+func (a *App) createProjectReply(
+	turn *mesga.Turn,
+	user *domain.User,
+	dialog *domain.Dialog,
+) (*mesga.Turn, error) {
 	reply := makeOutputTurn(turn)
 
 	tokens := strings.Split(turn.Message.Text, " ")
@@ -47,8 +57,8 @@ func (a *App) createProjectReply(turn *mesga.Turn) (*mesga.Turn, error) {
 	if err != nil {
 		return nil, errors.New(buildCreateProjectFailedMessage(err))
 	}
-	project, err := a.CreateProject(turn, &domain.Project{
-		User:    turn.User.User.Username,
+	project, err := a.CreateProject(user, &domain.Project{
+		User:    user.Username,
 		Title:   projectTitle,
 		DueDate: projectDueDate,
 	})
@@ -61,9 +71,13 @@ func (a *App) createProjectReply(turn *mesga.Turn) (*mesga.Turn, error) {
 	return reply, nil
 }
 
-func (a *App) listProjectsReply(turn *mesga.Turn) (*mesga.Turn, error) {
+func (a *App) listProjectsReply(
+	turn *mesga.Turn,
+	user *domain.User,
+	dialog *domain.Dialog,
+) (*mesga.Turn, error) {
 	reply := makeOutputTurn(turn)
-	projects, err := a.GetUserProjects(turn)
+	projects, err := a.GetUserProjects(user)
 	if err != nil {
 		return nil, errors.New(buildListProjectsFailedMessage(err))
 	}
@@ -86,9 +100,9 @@ func matchWithRegexp(text string, reg *regexp.Regexp) bool {
 
 func makeOutputTurn(turn *mesga.Turn) *mesga.Turn {
 	return &mesga.Turn{
-		Message: domain.Message{
-			Direction: OutputMessageCode,
-			System:    turn.Message.System,
+		System: mesga.TeamsCode,
+		Message: mesga.Message{
+			Direction: mesga.OutputCode,
 			Proactive: false,
 		},
 		Dialog: turn.Dialog,

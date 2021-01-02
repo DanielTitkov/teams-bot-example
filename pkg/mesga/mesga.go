@@ -13,6 +13,10 @@ const (
 	SlackCode = "slack"
 	// TelegramCode is internal telegram title
 	TelegramCode = "telegram"
+	// OutputCode for outgoing messages
+	OutputCode = "output"
+	// InputCode for incomming messages
+	InputCode = "input"
 )
 
 type (
@@ -36,8 +40,9 @@ func New(logger Logger, cfg Config) *Manager {
 	teams := newTeams(logger, cfg.Teams)
 	teams.sentChan = cfg.SentChan // pass channel to teams in order to get sent messages
 	return &Manager{
-		logger: logger,
-		teams:  teams,
+		logger:        logger,
+		teams:         teams,
+		proactiveChan: cfg.ProactiveChan,
 	}
 }
 
@@ -51,17 +56,14 @@ func (m *Manager) RunProactiveListener() error {
 	if m.proactiveChan == nil {
 		return errors.New("proactive channel is not set")
 	}
-	for {
-		select {
-		case turn := <-m.proactiveChan:
-			switch turn.System {
-			case TeamsCode:
-				m.teams.sendMessage(turn)
-			default:
-				m.logger.Error("got unknown system code", fmt.Errorf("%s", turn.System))
-			}
+	for turn := range m.proactiveChan {
+		switch turn.System {
+		case TeamsCode:
+			m.teams.sendMessage(turn)
 		default:
-			m.logger.Warn("wasn't able to send proactive message", "default")
+			m.logger.Error("got unknown system code", fmt.Errorf("%s", turn.System))
 		}
 	}
+	m.logger.Warn("proactive channel is closed", "")
+	return nil
 }

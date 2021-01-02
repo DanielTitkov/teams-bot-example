@@ -7,12 +7,12 @@ import (
 	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
 )
 
-func (a *App) GetOrCreateTeamsUserDialog(turn mesga.Turn) (*domain.Dialog, error) {
-	dialog, err := a.repo.GetUserDialog(turn.User.User)
+func (a *App) GetOrCreateTeamsUserDialog(turn mesga.Turn, user *domain.User) (*domain.Dialog, error) {
+	dialog, err := a.repo.GetUserDialog(user)
 	if err != nil {
-		dialog, err = a.repo.CreateDialog(turn.User.User, &domain.Dialog{
+		dialog, err = a.repo.CreateDialog(user, &domain.Dialog{
 			Meta: domain.DialogMeta{
-				Teams: turn.Dialog.Meta.Teams,
+				Teams: turn.Dialog.Teams,
 			},
 		})
 		if err != nil {

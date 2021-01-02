@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -83,7 +84,10 @@ func generateUserLogin(name string) string {
 }
 
 func (a *App) GetOrCreateTeamsUser(turn mesga.Turn) (*domain.User, error) {
-	user, err := a.repo.GetUserByTeamsID(*turn.User.Meta.Teams.ID)
+	if turn.User == nil {
+		return nil, errors.New("user data is not provided via turn")
+	}
+	user, err := a.repo.GetUserByTeamsID(*turn.User.Teams.ID)
 	if err != nil {
 		password := "123" // FIXME
 		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
@@ -92,12 +96,12 @@ func (a *App) GetOrCreateTeamsUser(turn mesga.Turn) (*domain.User, error) {
 		}
 
 		user, err = a.repo.CreateUser(&domain.User{
-			DisplayName:  *turn.User.Meta.Teams.Username,
-			Username:     generateUserLogin(*turn.User.Meta.Teams.Username),
+			DisplayName:  *turn.User.Teams.Username,
+			Username:     generateUserLogin(*turn.User.Teams.Username),
 			PasswordHash: string(hash),
 			Meta: domain.UserMeta{
 				Teams: domain.UserMessagerData{
-					ID: turn.User.Meta.Teams.ID,
+					ID: turn.User.Teams.ID,
 				},
 			},
 		})
@@ -107,16 +111,14 @@ func (a *App) GetOrCreateTeamsUser(turn mesga.Turn) (*domain.User, error) {
 		a.logger.Info("user created", fmt.Sprint(user))
 
 		err = a.SendTeamsProactive(&mesga.Turn{ // FIXME
-			Message: domain.Message{
+			System: mesga.TeamsCode,
+			Message: mesga.Message{
 				Text:      buildUserCreatedMessage(user.DisplayName, user.Username),
-				System:    TeamsSystemCode, // TODO: maybe put to turn
 				Direction: OutputMessageCode,
 				Proactive: true,
 			},
-			Dialog: mesga.TurnDialog{
-				Meta: domain.DialogMeta{
-					Teams: turn.Dialog.Meta.Teams,
-				},
+			Dialog: &mesga.Dialog{
+				Teams: turn.Dialog.Teams,
 			},
 		})
 		if err != nil {
