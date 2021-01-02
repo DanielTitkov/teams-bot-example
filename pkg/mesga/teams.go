@@ -72,6 +72,8 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 
 	var handler = activity.HandlerFuncs{
 		OnMessageFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
+			fmt.Printf("\nTURN\n%+v\n", turnCtx)
+			fmt.Printf("\nMESSAGE\n%+v\n", turnCtx.Activity)
 			response := t.onMessageHandler(t.activityToTurn(turnCtx))
 			turn = &response
 			attachments, err := t.getAttachments(turn.Message.Attachment)
@@ -173,9 +175,14 @@ func (t *Teams) sendMessage(turn *Turn) *Turn {
 func (t *Teams) activityToTurn(turnCtx *activity.TurnContext) Turn {
 	conversationRef := activity.GetCoversationReference(turnCtx.Activity)
 	jsonRef, err := json.Marshal(conversationRef)
+	jsonValue, err := json.Marshal(turnCtx.Activity.Value)
 	return Turn{
 		Message: Message{
-			Text:      turnCtx.Activity.Text,
+			Text: turnCtx.Activity.Text,
+			Payload: MessagePayload{
+				Type:  turnCtx.Activity.ValueType,
+				Value: string(jsonValue),
+			},
 			Direction: InputCode,
 		},
 		Dialog: &Dialog{

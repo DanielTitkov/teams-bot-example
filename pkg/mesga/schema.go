@@ -26,6 +26,12 @@ type (
 		Attachment string
 		Direction  string
 		Proactive  bool
+		Payload    MessagePayload
+	}
+	// MessagePayload stores teams activity value staff
+	MessagePayload struct {
+		Type  string
+		Value string // serialized payload // TODO: maybe have it as a map?
 	}
 	// Dialog holds dialog reference in different messagers
 	Dialog struct {

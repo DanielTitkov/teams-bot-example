@@ -37,7 +37,8 @@ func (a *App) defaultReply(
 ) (*mesga.Turn, error) {
 	reply := makeOutputTurn(turn)
 	reply.Message.Text = defaultReplyText
-	reply.Message.Attachment = introCardJSON
+	// reply.Message.Attachment = introCardJSON
+	reply.Message.Attachment = testActionCardJSON
 	return reply, nil
 }
 
