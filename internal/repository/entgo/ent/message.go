@@ -25,6 +25,10 @@ type Message struct {
 	Text string `json:"text,omitempty"`
 	// Attachment holds the value of the "attachment" field.
 	Attachment string `json:"attachment,omitempty"`
+	// PayloadType holds the value of the "payload_type" field.
+	PayloadType string `json:"payload_type,omitempty"`
+	// PayloadValue holds the value of the "payload_value" field.
+	PayloadValue string `json:"payload_value,omitempty"`
 	// System holds the value of the "system" field.
 	System string `json:"system,omitempty"`
 	// Direction holds the value of the "direction" field.
@@ -70,6 +74,8 @@ func (*Message) scanValues() []interface{} {
 		&sql.NullTime{},   // update_time
 		&sql.NullString{}, // text
 		&sql.NullString{}, // attachment
+		&sql.NullString{}, // payload_type
+		&sql.NullString{}, // payload_value
 		&sql.NullString{}, // system
 		&sql.NullString{}, // direction
 		&sql.NullBool{},   // proactive
@@ -117,27 +123,37 @@ func (m *Message) assignValues(values ...interface{}) error {
 		m.Attachment = value.String
 	}
 	if value, ok := values[4].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field system", values[4])
+		return fmt.Errorf("unexpected type %T for field payload_type", values[4])
+	} else if value.Valid {
+		m.PayloadType = value.String
+	}
+	if value, ok := values[5].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field payload_value", values[5])
+	} else if value.Valid {
+		m.PayloadValue = value.String
+	}
+	if value, ok := values[6].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field system", values[6])
 	} else if value.Valid {
 		m.System = value.String
 	}
-	if value, ok := values[5].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field direction", values[5])
+	if value, ok := values[7].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field direction", values[7])
 	} else if value.Valid {
 		m.Direction = value.String
 	}
-	if value, ok := values[6].(*sql.NullBool); !ok {
-		return fmt.Errorf("unexpected type %T for field proactive", values[6])
+	if value, ok := values[8].(*sql.NullBool); !ok {
+		return fmt.Errorf("unexpected type %T for field proactive", values[8])
 	} else if value.Valid {
 		m.Proactive = value.Bool
 	}
-	if value, ok := values[7].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field error", values[7])
+	if value, ok := values[9].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field error", values[9])
 	} else if value.Valid {
 		m.Error = new(string)
 		*m.Error = value.String
 	}
-	values = values[8:]
+	values = values[10:]
 	if len(values) == len(message.ForeignKeys) {
 		if value, ok := values[0].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field dialog_message", value)
@@ -185,6 +201,10 @@ func (m *Message) String() string {
 	builder.WriteString(m.Text)
 	builder.WriteString(", attachment=")
 	builder.WriteString(m.Attachment)
+	builder.WriteString(", payload_type=")
+	builder.WriteString(m.PayloadType)
+	builder.WriteString(", payload_value=")
+	builder.WriteString(m.PayloadValue)
 	builder.WriteString(", system=")
 	builder.WriteString(m.System)
 	builder.WriteString(", direction=")

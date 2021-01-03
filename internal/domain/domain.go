@@ -18,12 +18,14 @@ type (
 	}
 	// Message is used for messagers
 	Message struct { // TODO: maybe create container objects instead
-		ID         int
-		Text       string
-		Attachment string
-		System     string
-		Direction  string
-		Proactive  bool
+		ID           int
+		Text         string
+		Attachment   string
+		System       string
+		Direction    string
+		Proactive    bool
+		PayloadType  string
+		PayloadValue string
 	}
 	// UserMeta stores users data for messagers
 	UserMeta struct {

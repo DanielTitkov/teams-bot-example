@@ -46,45 +46,9 @@ const testActionCardJSON = (`{
 			"items": [
 			  {
 				"type": "TextBlock",
-				"text": "Publish Adaptive Card schema",
+				"text": "Создать проект",
 				"weight": "bolder",
 				"size": "medium"
-			  },
-			  {
-				"type": "ColumnSet",
-				"columns": [
-				  {
-					"type": "Column",
-					"width": "auto",
-					"items": [
-					  {
-						"type": "Image",
-						"url": "https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg",
-						"size": "small",
-						"style": "person"
-					  }
-					]
-				  },
-				  {
-					"type": "Column",
-					"width": "stretch",
-					"items": [
-					  {
-						"type": "TextBlock",
-						"text": "Matt Hidinger",
-						"weight": "bolder",
-						"wrap": true
-					  },
-					  {
-						"type": "TextBlock",
-						"spacing": "none",
-						"text": "Created {{DATE(2017-02-14T06:08:39Z, SHORT)}}",
-						"isSubtle": true,
-						"wrap": true
-					  }
-					]
-				  }
-				]
 			  }
 			]
 		  },
@@ -129,23 +93,34 @@ const testActionCardJSON = (`{
 			  "body": [
 				{
 				  "type": "Input.Text",
-				  "id": "comment",
-				  "isMultiline": true,
-				  "placeholder": "Enter your comment"
+				  "id": "title",
+				  "placeholder": "Название проекта"
+				},
+				{
+					"type": "Input.Text",
+					"id": "dueDate",
+					"placeholder": "Дата завершения проекта"
+				},
+				{
+					"type": "Input.Text",
+					"id": "app",
+					"value": "bar",
+					"isVisible": false
+				},
+				{
+					"type": "Input.Text",
+					"id": "action",
+					"value": "createProject",
+					"isVisible": false
 				}
 			  ],
 			  "actions": [
 				{
 				  "type": "Action.Submit",
-				  "title": "OK"
+				  "title": "Создать проект"
 				}
 			  ]
 			}
-		  },
-		  {
-			"type": "Action.OpenUrl",
-			"title": "View",
-			"url": "https://adaptivecards.io"
 		  }
 		]
 	  }`)

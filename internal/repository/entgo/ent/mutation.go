@@ -602,6 +602,8 @@ type MessageMutation struct {
 	update_time   *time.Time
 	text          *string
 	attachment    *string
+	payload_type  *string
+	payload_value *string
 	system        *string
 	direction     *string
 	proactive     *bool
@@ -866,6 +868,106 @@ func (m *MessageMutation) ResetAttachment() {
 	delete(m.clearedFields, message.FieldAttachment)
 }
 
+// SetPayloadType sets the payload_type field.
+func (m *MessageMutation) SetPayloadType(s string) {
+	m.payload_type = &s
+}
+
+// PayloadType returns the payload_type value in the mutation.
+func (m *MessageMutation) PayloadType() (r string, exists bool) {
+	v := m.payload_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPayloadType returns the old payload_type value of the Message.
+// If the Message object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *MessageMutation) OldPayloadType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPayloadType is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPayloadType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPayloadType: %w", err)
+	}
+	return oldValue.PayloadType, nil
+}
+
+// ClearPayloadType clears the value of payload_type.
+func (m *MessageMutation) ClearPayloadType() {
+	m.payload_type = nil
+	m.clearedFields[message.FieldPayloadType] = struct{}{}
+}
+
+// PayloadTypeCleared returns if the field payload_type was cleared in this mutation.
+func (m *MessageMutation) PayloadTypeCleared() bool {
+	_, ok := m.clearedFields[message.FieldPayloadType]
+	return ok
+}
+
+// ResetPayloadType reset all changes of the "payload_type" field.
+func (m *MessageMutation) ResetPayloadType() {
+	m.payload_type = nil
+	delete(m.clearedFields, message.FieldPayloadType)
+}
+
+// SetPayloadValue sets the payload_value field.
+func (m *MessageMutation) SetPayloadValue(s string) {
+	m.payload_value = &s
+}
+
+// PayloadValue returns the payload_value value in the mutation.
+func (m *MessageMutation) PayloadValue() (r string, exists bool) {
+	v := m.payload_value
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPayloadValue returns the old payload_value value of the Message.
+// If the Message object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *MessageMutation) OldPayloadValue(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPayloadValue is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPayloadValue requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPayloadValue: %w", err)
+	}
+	return oldValue.PayloadValue, nil
+}
+
+// ClearPayloadValue clears the value of payload_value.
+func (m *MessageMutation) ClearPayloadValue() {
+	m.payload_value = nil
+	m.clearedFields[message.FieldPayloadValue] = struct{}{}
+}
+
+// PayloadValueCleared returns if the field payload_value was cleared in this mutation.
+func (m *MessageMutation) PayloadValueCleared() bool {
+	_, ok := m.clearedFields[message.FieldPayloadValue]
+	return ok
+}
+
+// ResetPayloadValue reset all changes of the "payload_value" field.
+func (m *MessageMutation) ResetPayloadValue() {
+	m.payload_value = nil
+	delete(m.clearedFields, message.FieldPayloadValue)
+}
+
 // SetSystem sets the system field.
 func (m *MessageMutation) SetSystem(s string) {
 	m.system = &s
@@ -1080,7 +1182,7 @@ func (m *MessageMutation) Type() string {
 // this mutation. Note that, in order to get all numeric
 // fields that were in/decremented, call AddedFields().
 func (m *MessageMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 10)
 	if m.create_time != nil {
 		fields = append(fields, message.FieldCreateTime)
 	}
@@ -1092,6 +1194,12 @@ func (m *MessageMutation) Fields() []string {
 	}
 	if m.attachment != nil {
 		fields = append(fields, message.FieldAttachment)
+	}
+	if m.payload_type != nil {
+		fields = append(fields, message.FieldPayloadType)
+	}
+	if m.payload_value != nil {
+		fields = append(fields, message.FieldPayloadValue)
 	}
 	if m.system != nil {
 		fields = append(fields, message.FieldSystem)
@@ -1121,6 +1229,10 @@ func (m *MessageMutation) Field(name string) (ent.Value, bool) {
 		return m.Text()
 	case message.FieldAttachment:
 		return m.Attachment()
+	case message.FieldPayloadType:
+		return m.PayloadType()
+	case message.FieldPayloadValue:
+		return m.PayloadValue()
 	case message.FieldSystem:
 		return m.System()
 	case message.FieldDirection:
@@ -1146,6 +1258,10 @@ func (m *MessageMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldText(ctx)
 	case message.FieldAttachment:
 		return m.OldAttachment(ctx)
+	case message.FieldPayloadType:
+		return m.OldPayloadType(ctx)
+	case message.FieldPayloadValue:
+		return m.OldPayloadValue(ctx)
 	case message.FieldSystem:
 		return m.OldSystem(ctx)
 	case message.FieldDirection:
@@ -1190,6 +1306,20 @@ func (m *MessageMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAttachment(v)
+		return nil
+	case message.FieldPayloadType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPayloadType(v)
+		return nil
+	case message.FieldPayloadValue:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPayloadValue(v)
 		return nil
 	case message.FieldSystem:
 		v, ok := value.(string)
@@ -1255,6 +1385,12 @@ func (m *MessageMutation) ClearedFields() []string {
 	if m.FieldCleared(message.FieldAttachment) {
 		fields = append(fields, message.FieldAttachment)
 	}
+	if m.FieldCleared(message.FieldPayloadType) {
+		fields = append(fields, message.FieldPayloadType)
+	}
+	if m.FieldCleared(message.FieldPayloadValue) {
+		fields = append(fields, message.FieldPayloadValue)
+	}
 	if m.FieldCleared(message.FieldError) {
 		fields = append(fields, message.FieldError)
 	}
@@ -1277,6 +1413,12 @@ func (m *MessageMutation) ClearField(name string) error {
 		return nil
 	case message.FieldAttachment:
 		m.ClearAttachment()
+		return nil
+	case message.FieldPayloadType:
+		m.ClearPayloadType()
+		return nil
+	case message.FieldPayloadValue:
+		m.ClearPayloadValue()
 		return nil
 	case message.FieldError:
 		m.ClearError()
@@ -1301,6 +1443,12 @@ func (m *MessageMutation) ResetField(name string) error {
 		return nil
 	case message.FieldAttachment:
 		m.ResetAttachment()
+		return nil
+	case message.FieldPayloadType:
+		m.ResetPayloadType()
+		return nil
+	case message.FieldPayloadValue:
+		m.ResetPayloadValue()
 		return nil
 	case message.FieldSystem:
 		m.ResetSystem()

@@ -26,10 +26,12 @@ func mesgaToDomainDialog(d mesga.Dialog) domain.Dialog {
 
 func mesgaToDomainMessage(m mesga.Message) domain.Message {
 	return domain.Message{
-		Text:       m.Text,
-		Attachment: m.Attachment,
-		Direction:  m.Direction,
-		Proactive:  m.Proactive,
+		Text:         m.Text,
+		PayloadType:  m.Payload.Type,
+		PayloadValue: m.Payload.Value,
+		Attachment:   m.Attachment,
+		Direction:    m.Direction,
+		Proactive:    m.Proactive,
 	}
 }
 
@@ -53,5 +55,9 @@ func domainToMesgaMessage(m domain.Message) mesga.Message {
 		Attachment: m.Attachment,
 		Direction:  m.Direction,
 		Proactive:  m.Proactive,
+		Payload: mesga.MessagePayload{
+			Type:  m.PayloadType,
+			Value: m.PayloadValue,
+		},
 	}
 }

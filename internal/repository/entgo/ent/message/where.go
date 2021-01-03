@@ -121,6 +121,20 @@ func Attachment(v string) predicate.Message {
 	})
 }
 
+// PayloadType applies equality check predicate on the "payload_type" field. It's identical to PayloadTypeEQ.
+func PayloadType(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadValue applies equality check predicate on the "payload_value" field. It's identical to PayloadValueEQ.
+func PayloadValue(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPayloadValue), v))
+	})
+}
+
 // System applies equality check predicate on the "system" field. It's identical to SystemEQ.
 func System(v string) predicate.Message {
 	return predicate.Message(func(s *sql.Selector) {
@@ -548,6 +562,256 @@ func AttachmentEqualFold(v string) predicate.Message {
 func AttachmentContainsFold(v string) predicate.Message {
 	return predicate.Message(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldAttachment), v))
+	})
+}
+
+// PayloadTypeEQ applies the EQ predicate on the "payload_type" field.
+func PayloadTypeEQ(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadTypeNEQ applies the NEQ predicate on the "payload_type" field.
+func PayloadTypeNEQ(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadTypeIn applies the In predicate on the "payload_type" field.
+func PayloadTypeIn(vs ...string) predicate.Message {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Message(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldPayloadType), v...))
+	})
+}
+
+// PayloadTypeNotIn applies the NotIn predicate on the "payload_type" field.
+func PayloadTypeNotIn(vs ...string) predicate.Message {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Message(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldPayloadType), v...))
+	})
+}
+
+// PayloadTypeGT applies the GT predicate on the "payload_type" field.
+func PayloadTypeGT(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadTypeGTE applies the GTE predicate on the "payload_type" field.
+func PayloadTypeGTE(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadTypeLT applies the LT predicate on the "payload_type" field.
+func PayloadTypeLT(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadTypeLTE applies the LTE predicate on the "payload_type" field.
+func PayloadTypeLTE(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadTypeContains applies the Contains predicate on the "payload_type" field.
+func PayloadTypeContains(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadTypeHasPrefix applies the HasPrefix predicate on the "payload_type" field.
+func PayloadTypeHasPrefix(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadTypeHasSuffix applies the HasSuffix predicate on the "payload_type" field.
+func PayloadTypeHasSuffix(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadTypeIsNil applies the IsNil predicate on the "payload_type" field.
+func PayloadTypeIsNil() predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldPayloadType)))
+	})
+}
+
+// PayloadTypeNotNil applies the NotNil predicate on the "payload_type" field.
+func PayloadTypeNotNil() predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldPayloadType)))
+	})
+}
+
+// PayloadTypeEqualFold applies the EqualFold predicate on the "payload_type" field.
+func PayloadTypeEqualFold(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadTypeContainsFold applies the ContainsFold predicate on the "payload_type" field.
+func PayloadTypeContainsFold(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldPayloadType), v))
+	})
+}
+
+// PayloadValueEQ applies the EQ predicate on the "payload_value" field.
+func PayloadValueEQ(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPayloadValue), v))
+	})
+}
+
+// PayloadValueNEQ applies the NEQ predicate on the "payload_value" field.
+func PayloadValueNEQ(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPayloadValue), v))
+	})
+}
+
+// PayloadValueIn applies the In predicate on the "payload_value" field.
+func PayloadValueIn(vs ...string) predicate.Message {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Message(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldPayloadValue), v...))
+	})
+}
+
+// PayloadValueNotIn applies the NotIn predicate on the "payload_value" field.
+func PayloadValueNotIn(vs ...string) predicate.Message {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Message(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldPayloadValue), v...))
+	})
+}
+
+// PayloadValueGT applies the GT predicate on the "payload_value" field.
+func PayloadValueGT(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldPayloadValue), v))
+	})
+}
+
+// PayloadValueGTE applies the GTE predicate on the "payload_value" field.
+func PayloadValueGTE(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldPayloadValue), v))
+	})
+}
+
+// PayloadValueLT applies the LT predicate on the "payload_value" field.
+func PayloadValueLT(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldPayloadValue), v))
+	})
+}
+
+// PayloadValueLTE applies the LTE predicate on the "payload_value" field.
+func PayloadValueLTE(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldPayloadValue), v))
+	})
+}
+
+// PayloadValueContains applies the Contains predicate on the "payload_value" field.
+func PayloadValueContains(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldPayloadValue), v))
+	})
+}
+
+// PayloadValueHasPrefix applies the HasPrefix predicate on the "payload_value" field.
+func PayloadValueHasPrefix(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldPayloadValue), v))
+	})
+}
+
+// PayloadValueHasSuffix applies the HasSuffix predicate on the "payload_value" field.
+func PayloadValueHasSuffix(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldPayloadValue), v))
+	})
+}
+
+// PayloadValueIsNil applies the IsNil predicate on the "payload_value" field.
+func PayloadValueIsNil() predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldPayloadValue)))
+	})
+}
+
+// PayloadValueNotNil applies the NotNil predicate on the "payload_value" field.
+func PayloadValueNotNil() predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldPayloadValue)))
+	})
+}
+
+// PayloadValueEqualFold applies the EqualFold predicate on the "payload_value" field.
+func PayloadValueEqualFold(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldPayloadValue), v))
+	})
+}
+
+// PayloadValueContainsFold applies the ContainsFold predicate on the "payload_value" field.
+func PayloadValueContainsFold(v string) predicate.Message {
+	return predicate.Message(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldPayloadValue), v))
 	})
 }
 

@@ -24,6 +24,8 @@ func (r *EntgoRepository) CreateMessage(m *domain.Message, d *domain.Dialog, tur
 		Create().
 		SetDialogID(d.ID).
 		SetText(m.Text).
+		SetPayloadType(m.PayloadType).
+		SetPayloadValue(m.PayloadValue).
 		SetProactive(m.Proactive).
 		SetSystem(m.System).
 		SetDirection(m.Direction).

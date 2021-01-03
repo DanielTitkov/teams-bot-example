@@ -72,8 +72,6 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 
 	var handler = activity.HandlerFuncs{
 		OnMessageFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
-			fmt.Printf("\nTURN\n%+v\n", turnCtx)
-			fmt.Printf("\nMESSAGE\n%+v\n", turnCtx.Activity)
 			response := t.onMessageHandler(t.activityToTurn(turnCtx))
 			turn = &response
 			attachments, err := t.getAttachments(turn.Message.Attachment)

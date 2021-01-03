@@ -69,6 +69,46 @@ func (mu *MessageUpdate) ClearAttachment() *MessageUpdate {
 	return mu
 }
 
+// SetPayloadType sets the payload_type field.
+func (mu *MessageUpdate) SetPayloadType(s string) *MessageUpdate {
+	mu.mutation.SetPayloadType(s)
+	return mu
+}
+
+// SetNillablePayloadType sets the payload_type field if the given value is not nil.
+func (mu *MessageUpdate) SetNillablePayloadType(s *string) *MessageUpdate {
+	if s != nil {
+		mu.SetPayloadType(*s)
+	}
+	return mu
+}
+
+// ClearPayloadType clears the value of payload_type.
+func (mu *MessageUpdate) ClearPayloadType() *MessageUpdate {
+	mu.mutation.ClearPayloadType()
+	return mu
+}
+
+// SetPayloadValue sets the payload_value field.
+func (mu *MessageUpdate) SetPayloadValue(s string) *MessageUpdate {
+	mu.mutation.SetPayloadValue(s)
+	return mu
+}
+
+// SetNillablePayloadValue sets the payload_value field if the given value is not nil.
+func (mu *MessageUpdate) SetNillablePayloadValue(s *string) *MessageUpdate {
+	if s != nil {
+		mu.SetPayloadValue(*s)
+	}
+	return mu
+}
+
+// ClearPayloadValue clears the value of payload_value.
+func (mu *MessageUpdate) ClearPayloadValue() *MessageUpdate {
+	mu.mutation.ClearPayloadValue()
+	return mu
+}
+
 // SetSystem sets the system field.
 func (mu *MessageUpdate) SetSystem(s string) *MessageUpdate {
 	mu.mutation.SetSystem(s)
@@ -239,6 +279,32 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: message.FieldAttachment,
 		})
 	}
+	if value, ok := mu.mutation.PayloadType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldPayloadType,
+		})
+	}
+	if mu.mutation.PayloadTypeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: message.FieldPayloadType,
+		})
+	}
+	if value, ok := mu.mutation.PayloadValue(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldPayloadValue,
+		})
+	}
+	if mu.mutation.PayloadValueCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: message.FieldPayloadValue,
+		})
+	}
 	if value, ok := mu.mutation.System(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -363,6 +429,46 @@ func (muo *MessageUpdateOne) SetNillableAttachment(s *string) *MessageUpdateOne 
 // ClearAttachment clears the value of attachment.
 func (muo *MessageUpdateOne) ClearAttachment() *MessageUpdateOne {
 	muo.mutation.ClearAttachment()
+	return muo
+}
+
+// SetPayloadType sets the payload_type field.
+func (muo *MessageUpdateOne) SetPayloadType(s string) *MessageUpdateOne {
+	muo.mutation.SetPayloadType(s)
+	return muo
+}
+
+// SetNillablePayloadType sets the payload_type field if the given value is not nil.
+func (muo *MessageUpdateOne) SetNillablePayloadType(s *string) *MessageUpdateOne {
+	if s != nil {
+		muo.SetPayloadType(*s)
+	}
+	return muo
+}
+
+// ClearPayloadType clears the value of payload_type.
+func (muo *MessageUpdateOne) ClearPayloadType() *MessageUpdateOne {
+	muo.mutation.ClearPayloadType()
+	return muo
+}
+
+// SetPayloadValue sets the payload_value field.
+func (muo *MessageUpdateOne) SetPayloadValue(s string) *MessageUpdateOne {
+	muo.mutation.SetPayloadValue(s)
+	return muo
+}
+
+// SetNillablePayloadValue sets the payload_value field if the given value is not nil.
+func (muo *MessageUpdateOne) SetNillablePayloadValue(s *string) *MessageUpdateOne {
+	if s != nil {
+		muo.SetPayloadValue(*s)
+	}
+	return muo
+}
+
+// ClearPayloadValue clears the value of payload_value.
+func (muo *MessageUpdateOne) ClearPayloadValue() *MessageUpdateOne {
+	muo.mutation.ClearPayloadValue()
 	return muo
 }
 
@@ -532,6 +638,32 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (m *Message, err error
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: message.FieldAttachment,
+		})
+	}
+	if value, ok := muo.mutation.PayloadType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldPayloadType,
+		})
+	}
+	if muo.mutation.PayloadTypeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: message.FieldPayloadType,
+		})
+	}
+	if value, ok := muo.mutation.PayloadValue(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldPayloadValue,
+		})
+	}
+	if muo.mutation.PayloadValueCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: message.FieldPayloadValue,
 		})
 	}
 	if value, ok := muo.mutation.System(); ok {

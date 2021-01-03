@@ -77,6 +77,34 @@ func (mc *MessageCreate) SetNillableAttachment(s *string) *MessageCreate {
 	return mc
 }
 
+// SetPayloadType sets the payload_type field.
+func (mc *MessageCreate) SetPayloadType(s string) *MessageCreate {
+	mc.mutation.SetPayloadType(s)
+	return mc
+}
+
+// SetNillablePayloadType sets the payload_type field if the given value is not nil.
+func (mc *MessageCreate) SetNillablePayloadType(s *string) *MessageCreate {
+	if s != nil {
+		mc.SetPayloadType(*s)
+	}
+	return mc
+}
+
+// SetPayloadValue sets the payload_value field.
+func (mc *MessageCreate) SetPayloadValue(s string) *MessageCreate {
+	mc.mutation.SetPayloadValue(s)
+	return mc
+}
+
+// SetNillablePayloadValue sets the payload_value field if the given value is not nil.
+func (mc *MessageCreate) SetNillablePayloadValue(s *string) *MessageCreate {
+	if s != nil {
+		mc.SetPayloadValue(*s)
+	}
+	return mc
+}
+
 // SetSystem sets the system field.
 func (mc *MessageCreate) SetSystem(s string) *MessageCreate {
 	mc.mutation.SetSystem(s)
@@ -245,6 +273,22 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 			Column: message.FieldAttachment,
 		})
 		m.Attachment = value
+	}
+	if value, ok := mc.mutation.PayloadType(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldPayloadType,
+		})
+		m.PayloadType = value
+	}
+	if value, ok := mc.mutation.PayloadValue(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: message.FieldPayloadValue,
+		})
+		m.PayloadValue = value
 	}
 	if value, ok := mc.mutation.System(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

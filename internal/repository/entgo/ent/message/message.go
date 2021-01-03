@@ -19,6 +19,10 @@ const (
 	FieldText = "text"
 	// FieldAttachment holds the string denoting the attachment field in the database.
 	FieldAttachment = "attachment"
+	// FieldPayloadType holds the string denoting the payload_type field in the database.
+	FieldPayloadType = "payload_type"
+	// FieldPayloadValue holds the string denoting the payload_value field in the database.
+	FieldPayloadValue = "payload_value"
 	// FieldSystem holds the string denoting the system field in the database.
 	FieldSystem = "system"
 	// FieldDirection holds the string denoting the direction field in the database.
@@ -49,6 +53,8 @@ var Columns = []string{
 	FieldUpdateTime,
 	FieldText,
 	FieldAttachment,
+	FieldPayloadType,
+	FieldPayloadValue,
 	FieldSystem,
 	FieldDirection,
 	FieldProactive,

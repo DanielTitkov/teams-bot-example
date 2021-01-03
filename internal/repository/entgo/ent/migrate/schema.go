@@ -38,6 +38,8 @@ var (
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "text", Type: field.TypeString, Nullable: true},
 		{Name: "attachment", Type: field.TypeString, Nullable: true},
+		{Name: "payload_type", Type: field.TypeString, Nullable: true},
+		{Name: "payload_value", Type: field.TypeString, Nullable: true},
 		{Name: "system", Type: field.TypeString},
 		{Name: "direction", Type: field.TypeString},
 		{Name: "proactive", Type: field.TypeBool},
@@ -52,7 +54,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:  "messages_dialogs_message",
-				Columns: []*schema.Column{MessagesColumns[9]},
+				Columns: []*schema.Column{MessagesColumns[11]},
 
 				RefColumns: []*schema.Column{DialogsColumns[0]},
 				OnDelete:   schema.SetNull,
