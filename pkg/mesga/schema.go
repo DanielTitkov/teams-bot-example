@@ -3,11 +3,13 @@ package mesga
 type (
 	// Turn container strores all recieved data
 	Turn struct {
-		Message Message
-		Dialog  *Dialog
-		User    *User
-		System  string // message origin or messager to sent proactive
-		Err     error
+		Message     Message
+		Dialog      *Dialog
+		User        *User
+		Related     Related
+		System      string // message origin or messager to sent proactive
+		Err         error
+		DropRelated bool // tell to delete related message (for constructors etc)
 	}
 	// User holds user data
 	User struct {
@@ -35,6 +37,12 @@ type (
 	}
 	// Dialog holds dialog reference in different messagers
 	Dialog struct {
+		Teams    string // serialized reference
+		Telegram string
+		Slack    string
+	}
+	// Related holds reference to related message
+	Related struct {
 		Teams    string // serialized reference
 		Telegram string
 		Slack    string

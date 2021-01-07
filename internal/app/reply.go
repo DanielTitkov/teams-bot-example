@@ -86,7 +86,7 @@ func (a *App) defaultReply(
 	reply := makeOutputTurn(turn)
 	reply.Message.Text = defaultReplyText
 	c := buildIntroCard()
-	introCardJSON, err := c.StringIndent("", "  ")
+	introCardJSON, err := c.String()
 	if err != nil {
 		return reply, err
 	}
@@ -102,7 +102,7 @@ func (a *App) initCreateProjectReply(
 ) (*mesga.Turn, error) {
 	reply := makeOutputTurn(turn)
 	c := buildCreateProjectCard()
-	createProjectCardJSON, err := c.StringIndent("", "  ")
+	createProjectCardJSON, err := c.String()
 	if err != nil {
 		return reply, err
 	}
@@ -170,7 +170,7 @@ func (a *App) createProjectFromPayloadReply(
 	}
 
 	reply.Message.Text = buildCreateProjectSuccessMessage(project.Title, project.DueDate, project.ID)
-
+	reply.DropRelated = true
 	return reply, nil
 }
 

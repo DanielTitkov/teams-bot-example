@@ -73,11 +73,29 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 	var handler = activity.HandlerFuncs{
 		OnMessageFunc: func(turnCtx *activity.TurnContext) (schema.Activity, error) {
 			response := t.onMessageHandler(t.activityToTurn(turnCtx))
+			response.Related.Teams = turnCtx.Activity.ReplyToID
 			turn = &response
 			attachments, err := t.getAttachments(turn.Message.Attachment)
 			if err != nil {
 				turn.Err = err
 				return schema.Activity{}, err
+			}
+
+			if response.DropRelated {
+				var ref schema.ConversationReference
+				err = json.Unmarshal([]byte(turn.Dialog.Teams), &ref)
+				if err != nil {
+					turn.Err = err
+					return schema.Activity{}, err
+				}
+				err = t.adapter.DeleteActivity(context.TODO(), response.Related.Teams, ref)
+				if err != nil {
+					turn.Err = err
+					fmt.Println("\nREF", ref)
+					fmt.Println("\nID", response.Related.Teams)
+					fmt.Println("\n\n\nERROR DELETE", err)
+					return schema.Activity{}, err
+				}
 			}
 
 			return turnCtx.SendActivity(activity.MsgOptionText(response.Message.Text), activity.MsgOptionAttachments(attachments))
