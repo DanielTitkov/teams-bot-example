@@ -15,7 +15,9 @@ import (
 )
 
 const (
-	createProjectAction = "createProject"
+	createProjectAction     = "createProject"
+	showProjectsAction      = "showProjects"
+	initCreateProjectAction = "initCreateProject"
 )
 
 func (a *App) buildReply(
@@ -64,6 +66,10 @@ func (a *App) buildPayloadReply(
 	switch action := header.Action; action {
 	case createProjectAction:
 		return a.createProjectFromPayloadReply(turn, user, dialog)
+	case showProjectsAction:
+		return a.listProjectsReply(turn, user, dialog)
+	case initCreateProjectAction:
+		return a.initCreateProjectReply(turn, user, dialog)
 	default:
 		warn := fmt.Sprintf("got unknown action: %s", action)
 		a.logger.Warn("failed to perform requested action", warn)
@@ -79,8 +85,29 @@ func (a *App) defaultReply(
 ) (*mesga.Turn, error) {
 	reply := makeOutputTurn(turn)
 	reply.Message.Text = defaultReplyText
-	// reply.Message.Attachment = introCardJSON
-	reply.Message.Attachment = testActionCardJSON
+	c := buildIntroCard()
+	introCardJSON, err := c.StringIndent("", "  ")
+	if err != nil {
+		return reply, err
+	}
+
+	reply.Message.Attachment = introCardJSON
+	return reply, nil
+}
+
+func (a *App) initCreateProjectReply(
+	turn *mesga.Turn,
+	user *domain.User,
+	dialog *domain.Dialog,
+) (*mesga.Turn, error) {
+	reply := makeOutputTurn(turn)
+	c := buildCreateProjectCard()
+	createProjectCardJSON, err := c.StringIndent("", "  ")
+	if err != nil {
+		return reply, err
+	}
+
+	reply.Message.Attachment = createProjectCardJSON
 	return reply, nil
 }
 
