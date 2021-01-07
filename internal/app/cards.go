@@ -13,6 +13,7 @@ func buildIntroCard() *cards.Card {
 			Size:   "large",
 		},
 		&cards.Container{
+			Style: "emphasis",
 			Items: []cards.Node{
 				&cards.TextBlock{
 					Text:   "Создать проект <название> <дата окончания в формате 30.12.2020>",

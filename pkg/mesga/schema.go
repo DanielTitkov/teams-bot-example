@@ -9,7 +9,7 @@ type (
 		Related     Related
 		System      string // message origin or messager to sent proactive
 		Err         error
-		DropRelated bool // tell to delete related message (for constructors etc)
+		DropRelated bool // tells to delete related message (for constructors etc)
 	}
 	// User holds user data
 	User struct {

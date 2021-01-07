@@ -91,9 +91,6 @@ func (t *Teams) processMessage(w http.ResponseWriter, req *http.Request) {
 				err = t.adapter.DeleteActivity(context.TODO(), response.Related.Teams, ref)
 				if err != nil {
 					turn.Err = err
-					fmt.Println("\nREF", ref)
-					fmt.Println("\nID", response.Related.Teams)
-					fmt.Println("\n\n\nERROR DELETE", err)
 					return schema.Activity{}, err
 				}
 			}

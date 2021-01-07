@@ -3,7 +3,7 @@ module github.com/DanielTitkov/teams-bot-example
 go 1.13
 
 require (
-	github.com/DanielTitkov/go-adaptive-cards v0.1.0
+	github.com/DanielTitkov/go-adaptive-cards v0.2.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/facebook/ent v0.4.2
 	github.com/infracloudio/msbotbuilder-go v0.2.2
