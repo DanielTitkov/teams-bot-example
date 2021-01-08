@@ -1,6 +1,7 @@
 package states
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 )
@@ -20,8 +21,8 @@ type Manager struct {
 
 // Call tries to perform some action
 func (m *Manager) Call(action *Action, jsonArgs string) (jsonResult string, err error) {
-	m.mx.Lock()
-	defer m.mx.Unlock()
+	// m.mx.Lock()
+	// defer m.mx.Unlock()
 
 	current, err := m.getState(jsonArgs)
 	if err != nil {
@@ -91,6 +92,9 @@ type Action struct {
 }
 
 func (a *Action) do(jsonArgs string, data map[string]interface{}) (jsonResult string, err error) {
+	if a.fn == nil {
+		return jsonResult, errors.New("action fn is not set")
+	}
 	res, err := a.fn(jsonArgs, data)
 	if err != nil {
 		return jsonResult, err
