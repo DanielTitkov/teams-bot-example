@@ -1,4 +1,4 @@
-package states
+package mesga
 
 import (
 	"errors"
@@ -6,49 +6,49 @@ import (
 	"sync"
 )
 
-// Manager is a state engine that manages dialog states
-type Manager struct {
+// States is a state engine that manages dialog states
+type States struct {
 	States  []*State
 	Root    *State
 	Current *State
 
 	mx                sync.Mutex
-	transitionMapping map[string]string                     // or maybe state to state
-	useMapping        bool                                  // otherwise use states' transitions
-	getStateFn        func(jsonArgs string) (*State, error) // for external state storage
-	storeStateFn      func(*State) error                    // for external state storage
+	transitionMapping map[string]string           // or maybe state to state
+	useMapping        bool                        // otherwise use states' transitions
+	getStateFn        func(*Turn) (*State, error) // for external state storage
+	storeStateFn      func(*State) error          // for external state storage
 }
 
 // Call tries to perform some action
-func (m *Manager) Call(action *Action, jsonArgs string) (jsonResult string, err error) {
+func (m *States) Call(action *Action, turn *Turn) (reply *Turn, err error) {
 	// m.mx.Lock()
 	// defer m.mx.Unlock()
 
-	current, err := m.getState(jsonArgs)
+	current, err := m.getState(turn)
 	if err != nil {
-		return jsonResult, err
+		return reply, err
 	}
 
 	if !isAllowed(action, current.AllowedActions) {
-		return jsonResult, fmt.Errorf("action %s is not allowed in state %s", action.Title, m.Current.Title)
+		return reply, fmt.Errorf("action %s is not allowed in state %s", action.Title, m.Current.Title)
 	}
 
-	res, err := action.do(jsonArgs, current.Data)
+	reply, err = action.do(turn, current.Data)
 	if err != nil {
 		if action.OnFailTransition != nil {
 			m.setState(action.OnFailTransition)
 		}
-		return jsonResult, err
+		return reply, err
 	}
 
 	if action.OnSuccessTransition != nil {
 		m.setState(action.OnSuccessTransition)
 	}
 
-	return res, nil
+	return reply, nil
 }
 
-func (m *Manager) setState(state *State) {
+func (m *States) setState(state *State) {
 	m.mx.Lock()
 	defer m.mx.Unlock()
 	if m.storeStateFn != nil {
@@ -57,12 +57,12 @@ func (m *Manager) setState(state *State) {
 	m.Current = state
 }
 
-func (m *Manager) getState(jsonArgs string) (*State, error) {
+func (m *States) getState(turn *Turn) (*State, error) {
 	m.mx.Lock()
 	defer m.mx.Unlock()
 
 	if m.getStateFn != nil {
-		current, err := m.getStateFn(jsonArgs)
+		current, err := m.getStateFn(turn)
 		if err != nil {
 			return nil, err
 		}
@@ -88,16 +88,16 @@ type Action struct {
 	OnSuccessTransition *State
 	OnFailTransition    *State
 
-	fn func(jsonArgs string, data map[string]interface{}) (jsonResult string, err error)
+	fn func(turn *Turn, data map[string]interface{}) (reply *Turn, err error)
 }
 
-func (a *Action) do(jsonArgs string, data map[string]interface{}) (jsonResult string, err error) {
+func (a *Action) do(turn *Turn, data map[string]interface{}) (reply *Turn, err error) {
 	if a.fn == nil {
-		return jsonResult, errors.New("action fn is not set")
+		return reply, errors.New("action fn is not set")
 	}
-	res, err := a.fn(jsonArgs, data)
+	res, err := a.fn(turn, data)
 	if err != nil {
-		return jsonResult, err
+		return reply, err
 	}
 	return res, nil
 }

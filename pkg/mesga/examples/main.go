@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/DanielTitkov/teams-bot-example/pkg/states"
+	"github.com/DanielTitkov/teams-bot-example/pkg/mesga/states"
 )
 
 func main() {
