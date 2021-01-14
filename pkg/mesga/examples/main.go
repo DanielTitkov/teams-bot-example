@@ -4,35 +4,65 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/DanielTitkov/teams-bot-example/pkg/mesga/states"
+	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
 )
 
-func main() {
-	log.Println("Running states")
+func createProjectFn(turn *Turn, data map[string]interface{}) (reply *Turn, err error) {
+	fmt.Println("running create project")
+	return turn, nil
+}
 
-	createProjectAction := states.Action{
+func addProjectTitleFn(turn *Turn, data map[string]interface{}) (reply *Turn, err error) {
+	fmt.Println("running add project title")
+	return turn, nil
+}
+
+func listProjectsFn(turn *Turn, data map[string]interface{}) (reply *Turn, err error) {
+	fmt.Println("running list projects")
+	return turn, nil
+}
+
+func main() {
+	log.Println("Running mesga")
+
+	s := mesga.Setup(
+		mesga.AddState(
+			"root",
+			mesga.AddAction("", createProjectFn),
+			mesga.AddAction("", listProjectsFn),
+		),
+		mesga.AddState(
+			"createProject",
+			mesga.AddActionRgxp("", "", createProjectFn),
+		),
+	)
+
+	createProjectAction := mesga.Action{
 		Title: "createProject",
 	}
-	addProjectTitleAction := states.Action{
+	addProjectTitleAction := mesga.Action{
 		Title: "addProjectTitle",
 	}
 
-	rootState := states.State{
+	rootState := mesga.State{
 		Title:          "root",
-		AllowedActions: []*states.Action{&createProjectAction},
+		AllowedActions: []*mesga.Action{&createProjectAction},
 	}
 
-	createProjectState := states.State{
+	createProjectState := mesga.State{
 		Title:          "createProject",
-		AllowedActions: []*states.Action{&addProjectTitleAction},
+		AllowedActions: []*mesga.Action{&addProjectTitleAction},
 	}
 
-	m := states.Manager{
-		States: []*states.State{
+	m := mesga.States{
+		States: []*mesga.State{
 			&rootState,
 			&createProjectState,
 		},
+		Root:    &rootState,
+		Current: &rootState,
 	}
 
-	fmt.Println(m.Call(&addProjectTitleAction, ""))
+	fmt.Println(m.Call(&addProjectTitleAction, &mesga.Turn{}))
+	fmt.Println(m.Call(&createProjectAction, &mesga.Turn{}))
 }

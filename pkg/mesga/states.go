@@ -19,6 +19,9 @@ type States struct {
 	storeStateFn      func(*State) error          // for external state storage
 }
 
+// New states returns states manager
+func NewStates() {}
+
 // Call tries to perform some action
 func (m *States) Call(action *Action, turn *Turn) (reply *Turn, err error) {
 	// m.mx.Lock()
