@@ -25,17 +25,48 @@ func listProjectsFn(turn *Turn, data map[string]interface{}) (reply *Turn, err e
 func main() {
 	log.Println("Running mesga")
 
-	s := mesga.Setup(
-		mesga.AddState(
-			"root",
-			mesga.AddAction("", createProjectFn),
-			mesga.AddAction("", listProjectsFn),
-		),
-		mesga.AddState(
-			"createProject",
-			mesga.AddActionRgxp("", "", createProjectFn),
-		),
-	)
+	r := mesga.RouterSetup{
+		States: []mesga.StateSetup{
+			{
+				Title: "root",
+				Actions: []mesga.ActionSetup{
+					{
+						TriggerText:          "Создать проект",
+						TriggerTextRgxp:      "",
+						TriggerPayloadAction: "",
+						OnSuccessTransition:  "",
+						OnFailTransition:     "",
+						Function:             createProjectFn,
+					},
+					{
+						TriggerText:          "Мои проекты",
+						TriggerTextRgxp:      "",
+						TriggerPayloadAction: "",
+						OnSuccessTransition:  "createProject",
+						OnFailTransition:     "",
+						Function:             listProjectsFn,
+					},
+				},
+				Default: mesga.ActionSetup{},
+				Data:    map[string]interface{}{},
+			},
+			{
+				Title: "createProject",
+				Actions: []mesga.ActionSetup{
+					{
+						TriggerText:          "",
+						TriggerTextRgxp:      ".*",
+						TriggerPayloadAction: "",
+						OnSuccessTransition:  "root",
+						OnFailTransition:     "root",
+						Function:             addProjectTitleFn,
+					},
+				},
+				Default: mesga.ActionSetup{},
+				Data:    map[string]interface{}{},
+			},
+		},
+	}
 
 	createProjectAction := mesga.Action{
 		Title: "createProject",

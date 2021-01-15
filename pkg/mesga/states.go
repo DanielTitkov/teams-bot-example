@@ -6,8 +6,8 @@ import (
 	"sync"
 )
 
-// States is a state engine that manages dialog states
-type States struct {
+// Router is a state engine that manages dialog states
+type Router struct {
 	States  []*State
 	Root    *State
 	Current *State
@@ -19,11 +19,13 @@ type States struct {
 	storeStateFn      func(*State) error          // for external state storage
 }
 
-// New states returns states manager
-func NewStates() {}
+// Respond generates new turn
+func (r *Router) Respond(turn *Turn) (*Turn, error) {
+	return turn, nil
+}
 
 // Call tries to perform some action
-func (m *States) Call(action *Action, turn *Turn) (reply *Turn, err error) {
+func (m *Router) Call(action *Action, turn *Turn) (reply *Turn, err error) {
 	// m.mx.Lock()
 	// defer m.mx.Unlock()
 
@@ -51,7 +53,7 @@ func (m *States) Call(action *Action, turn *Turn) (reply *Turn, err error) {
 	return reply, nil
 }
 
-func (m *States) setState(state *State) {
+func (m *Router) setState(state *State) {
 	m.mx.Lock()
 	defer m.mx.Unlock()
 	if m.storeStateFn != nil {
@@ -60,7 +62,7 @@ func (m *States) setState(state *State) {
 	m.Current = state
 }
 
-func (m *States) getState(turn *Turn) (*State, error) {
+func (m *Router) getState(turn *Turn) (*State, error) {
 	m.mx.Lock()
 	defer m.mx.Unlock()
 
