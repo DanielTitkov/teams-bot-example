@@ -7,17 +7,17 @@ import (
 	"github.com/DanielTitkov/teams-bot-example/pkg/mesga"
 )
 
-func createProjectFn(turn *Turn, data map[string]interface{}) (reply *Turn, err error) {
+func createProjectFn(turn *mesga.Turn, data map[string]interface{}) (reply *mesga.Turn, err error) {
 	fmt.Println("running create project")
 	return turn, nil
 }
 
-func addProjectTitleFn(turn *Turn, data map[string]interface{}) (reply *Turn, err error) {
+func addProjectTitleFn(turn *mesga.Turn, data map[string]interface{}) (reply *mesga.Turn, err error) {
 	fmt.Println("running add project title")
 	return turn, nil
 }
 
-func listProjectsFn(turn *Turn, data map[string]interface{}) (reply *Turn, err error) {
+func listProjectsFn(turn *mesga.Turn, data map[string]interface{}) (reply *mesga.Turn, err error) {
 	fmt.Println("running list projects")
 	return turn, nil
 }
@@ -25,26 +25,19 @@ func listProjectsFn(turn *Turn, data map[string]interface{}) (reply *Turn, err e
 func main() {
 	log.Println("Running mesga")
 
-	r := mesga.RouterSetup{
+	setup := mesga.RouterSetup{
 		States: []mesga.StateSetup{
 			{
 				Title: "root",
 				Actions: []mesga.ActionSetup{
 					{
-						TriggerText:          "Создать проект",
-						TriggerTextRgxp:      "",
-						TriggerPayloadAction: "",
-						OnSuccessTransition:  "",
-						OnFailTransition:     "",
-						Function:             createProjectFn,
+						TriggerText: "Создать проект",
+						Function:    createProjectFn,
 					},
 					{
-						TriggerText:          "Мои проекты",
-						TriggerTextRgxp:      "",
-						TriggerPayloadAction: "",
-						OnSuccessTransition:  "createProject",
-						OnFailTransition:     "",
-						Function:             listProjectsFn,
+						TriggerText:         "Мои проекты",
+						OnSuccessTransition: "createProject",
+						Function:            listProjectsFn,
 					},
 				},
 				Default: mesga.ActionSetup{},
@@ -54,12 +47,10 @@ func main() {
 				Title: "createProject",
 				Actions: []mesga.ActionSetup{
 					{
-						TriggerText:          "",
-						TriggerTextRgxp:      ".*",
-						TriggerPayloadAction: "",
-						OnSuccessTransition:  "root",
-						OnFailTransition:     "root",
-						Function:             addProjectTitleFn,
+						TriggerTextRgxp:     ".*",
+						OnSuccessTransition: "root",
+						OnFailTransition:    "root",
+						Function:            addProjectTitleFn,
 					},
 				},
 				Default: mesga.ActionSetup{},
@@ -67,6 +58,8 @@ func main() {
 			},
 		},
 	}
+
+	fmt.Println(setup)
 
 	createProjectAction := mesga.Action{
 		Title: "createProject",
@@ -85,7 +78,7 @@ func main() {
 		AllowedActions: []*mesga.Action{&addProjectTitleAction},
 	}
 
-	m := mesga.States{
+	m := mesga.Router{
 		States: []*mesga.State{
 			&rootState,
 			&createProjectState,

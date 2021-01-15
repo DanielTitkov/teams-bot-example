@@ -12,6 +12,7 @@ type Router struct {
 	Root    *State
 	Current *State
 
+	stateMapping      map[string]*State
 	mx                sync.Mutex
 	transitionMapping map[string]string           // or maybe state to state
 	useMapping        bool                        // otherwise use states' transitions
@@ -79,11 +80,14 @@ func (m *Router) getState(turn *Turn) (*State, error) {
 
 // State is dialog state
 type State struct {
-	Title            string
-	Data             map[string]interface{}
-	AllowedActions   []*Action
-	OnEnterCallbacks []*Action
-	OnExitCallbacks  []*Action
+	Title                 string
+	Data                  map[string]interface{}
+	AllowedActions        []*Action
+	OnEnterCallbacks      []*Action
+	OnExitCallbacks       []*Action
+	textActionMapping     map[string]*Action
+	textRgxpActionMapping map[string]*Action // FIXME
+	payloadActionMapping  map[string]*Action
 	// IsRoot           bool
 }
 
