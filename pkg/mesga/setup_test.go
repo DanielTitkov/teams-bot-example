@@ -154,3 +154,115 @@ func TestMulptipleTriggers(t *testing.T) {
 		t.Error("expected to get an error, but got nil")
 	}
 }
+
+func TestNoTriggers(t *testing.T) {
+	setup := RouterSetup{
+		States: []StateSetup{
+			{
+				Title: "state1",
+				Actions: []ActionSetup{
+					{
+						Function: createProjectFn,
+					},
+				},
+				Default: ActionSetup{},
+			},
+		},
+	}
+
+	if _, err := NewRouter(setup); err == nil {
+		t.Error("expected to get an error, but got nil")
+	}
+}
+
+func TestRepeatedTriggers(t *testing.T) {
+	setup := RouterSetup{
+		States: []StateSetup{
+			{
+				Title: "state1",
+				Actions: []ActionSetup{
+					{
+						TriggerText: "Создать проект",
+						Function:    createProjectFn,
+					},
+					{
+						TriggerText: "Создать проект",
+						Function:    createProjectFn,
+					},
+				},
+				Default: ActionSetup{},
+			},
+		},
+	}
+
+	if _, err := NewRouter(setup); err == nil {
+		t.Error("expected to get an error, but got nil")
+	}
+
+	setup2 := RouterSetup{
+		States: []StateSetup{
+			{
+				Title: "state1",
+				Actions: []ActionSetup{
+					{
+						TriggerPayloadAction: "action",
+						Function:             createProjectFn,
+					},
+					{
+						TriggerPayloadAction: "action",
+						Function:             createProjectFn,
+					},
+				},
+				Default: ActionSetup{},
+			},
+		},
+	}
+
+	if _, err := NewRouter(setup2); err == nil {
+		t.Error("expected to get an error, but got nil")
+	}
+
+	setup3 := RouterSetup{
+		States: []StateSetup{
+			{
+				Title: "state1",
+				Actions: []ActionSetup{
+					{
+						TriggerTextRgxp: ".*",
+						Function:        createProjectFn,
+					},
+					{
+						TriggerTextRgxp: ".*",
+						Function:        createProjectFn,
+					},
+				},
+				Default: ActionSetup{},
+			},
+		},
+	}
+
+	if _, err := NewRouter(setup3); err == nil {
+		t.Error("expected to get an error, but got nil")
+	}
+}
+
+func TestBadRgxpTrigger(t *testing.T) {
+	setup := RouterSetup{
+		States: []StateSetup{
+			{
+				Title: "state1",
+				Actions: []ActionSetup{
+					{
+						TriggerTextRgxp: "***",
+						Function:        createProjectFn,
+					},
+				},
+				Default: ActionSetup{},
+			},
+		},
+	}
+
+	if _, err := NewRouter(setup); err == nil {
+		t.Error("expected to get an error, but got nil")
+	}
+}

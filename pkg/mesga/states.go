@@ -3,6 +3,7 @@ package mesga
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"sync"
 )
 
@@ -86,7 +87,7 @@ type State struct {
 	OnEnterCallbacks      []*Action
 	OnExitCallbacks       []*Action
 	textActionMapping     map[string]*Action
-	textRgxpActionMapping map[string]*Action // FIXME
+	textRgxpActionMapping map[*regexp.Regexp]*Action
 	payloadActionMapping  map[string]*Action
 	// IsRoot           bool
 }

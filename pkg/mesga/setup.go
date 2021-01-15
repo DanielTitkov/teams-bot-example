@@ -2,7 +2,7 @@ package mesga
 
 import (
 	"errors"
-	"fmt"
+	"regexp"
 )
 
 func NewRouter(setup RouterSetup) (*Router, error) {
@@ -13,9 +13,6 @@ func NewRouter(setup RouterSetup) (*Router, error) {
 		state := &State{
 			Title: stateSetup.Title,
 			Data:  stateSetup.Data,
-			// textActionMapping:     textActionMapping,
-			// textRgxpActionMapping: textRgxpActionMapping,
-			// payloadActionMapping:  payloadActionMapping,
 		}
 
 		if _, ok := stateMapping[stateSetup.Title]; ok {
@@ -26,13 +23,14 @@ func NewRouter(setup RouterSetup) (*Router, error) {
 
 	// after states are created populate them with actions
 	// two loops are needed for validation
-	// for action can be validated on when all states are known
+	// for actions can be validated only when all states are known
 	for _, stateSetup := range setup.States {
-		// state := stateMapping[stateSetup.Title]
+		state := stateMapping[stateSetup.Title]
 
-		// textActionMapping := make(map[string]*Action)
-		// textRgxpActionMapping := make(map[string]*Action)
-		// payloadActionMapping := make(map[string]*Action)
+		textActionMapping := make(map[string]*Action)
+		payloadActionMapping := make(map[string]*Action)
+		textRgxpActionMapping := make(map[*regexp.Regexp]*Action)
+		regexpMapping := make(map[string]struct{}) // for regexp validaion
 
 		for _, actionSetup := range stateSetup.Actions {
 			if actionSetup.OnSuccessTransition != "" {
@@ -52,12 +50,52 @@ func NewRouter(setup RouterSetup) (*Router, error) {
 				actionSetup.TriggerTextRgxp != "",
 				actionSetup.TriggerPayloadAction != "",
 			) {
-				return nil, errors.New("action must have only one trigger type")
+				return nil, errors.New("action must have exactly one trigger")
 			}
 
-			// action := &Action{}
-		}
+			action := &Action{
+				OnSuccessTransition: stateMapping[actionSetup.OnSuccessTransition],
+				OnFailTransition:    stateMapping[actionSetup.OnFailTransition],
+				fn:                  actionSetup.Function,
+			}
 
+			if actionSetup.TriggerText != "" {
+				if _, ok := textActionMapping[actionSetup.TriggerText]; ok {
+					return nil, errors.New("action triggers must be unique within a state")
+				}
+				textActionMapping[actionSetup.TriggerText] = action
+			}
+
+			if actionSetup.TriggerPayloadAction != "" {
+				if _, ok := payloadActionMapping[actionSetup.TriggerPayloadAction]; ok {
+					return nil, errors.New("action triggers must be unique within a state")
+				}
+				payloadActionMapping[actionSetup.TriggerPayloadAction] = action
+			}
+
+			if actionSetup.TriggerTextRgxp != "" {
+				if _, ok := regexpMapping[actionSetup.TriggerTextRgxp]; ok {
+					return nil, errors.New("action triggers must be unique within a state")
+				}
+				regexpMapping[actionSetup.TriggerTextRgxp] = struct{}{}
+				rgxp, err := regexp.Compile(actionSetup.TriggerTextRgxp)
+				if err != nil {
+					return nil, err
+				}
+				textRgxpActionMapping[rgxp] = action
+			}
+
+			state.payloadActionMapping = payloadActionMapping
+			state.textActionMapping = textActionMapping
+			state.textRgxpActionMapping = textRgxpActionMapping
+		}
+		// TODO:
+		// add state functions
+		// add root and current
+		// add state callbacks
+		// validate action has function
+		// add systems
+		// add proactive stack?
 	}
 
 	router := &Router{
@@ -96,7 +134,6 @@ func xor(bools ...bool) bool {
 			trues = append(trues, struct{}{})
 		}
 	}
-	fmt.Println(trues)
 	if len(trues) == 1 {
 		return true
 	}
