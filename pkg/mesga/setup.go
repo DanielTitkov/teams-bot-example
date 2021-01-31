@@ -6,9 +6,16 @@ import (
 )
 
 func NewRouter(setup RouterSetup) (*Router, error) {
+	if setup.StoreStateFn == nil {
+		return nil, errors.New("router must have store state function") // TODO: maybe add default funcs
+	}
+
+	if setup.GetStateFn == nil {
+		return nil, errors.New("router must have get state function")
+	}
+
 	stateMapping := make(map[string]*State)
 
-	var states []*State
 	for _, stateSetup := range setup.States {
 		state := &State{
 			Title: stateSetup.Title,
@@ -19,6 +26,11 @@ func NewRouter(setup RouterSetup) (*Router, error) {
 			return nil, errors.New("state title must be unique, but title is repeated: " + stateSetup.Title)
 		}
 		stateMapping[stateSetup.Title] = state
+	}
+
+	root, ok := stateMapping["root"]
+	if !ok {
+		return nil, errors.New("root state is required")
 	}
 
 	// after states are created populate them with actions
@@ -33,6 +45,10 @@ func NewRouter(setup RouterSetup) (*Router, error) {
 		regexpMapping := make(map[string]struct{}) // for regexp validaion
 
 		for _, actionSetup := range stateSetup.Actions {
+			if actionSetup.Function == nil {
+				return nil, errors.New("action must have function")
+			}
+
 			if actionSetup.OnSuccessTransition != "" {
 				if _, ok := stateMapping[actionSetup.OnSuccessTransition]; !ok {
 					return nil, errors.New("action declares transition to an unknown state: " + actionSetup.OnSuccessTransition)
@@ -93,20 +109,28 @@ func NewRouter(setup RouterSetup) (*Router, error) {
 		// add state functions
 		// add root and current
 		// add state callbacks
-		// validate action has function
 		// add systems
 		// add proactive stack?
 	}
 
 	router := &Router{
-		States: states,
+		Root:         root,
+		Current:      root,
+		stateMapping: stateMapping,
+		getStateFn:   setup.GetStateFn,
+		storeStateFn: setup.StoreStateFn,
 	}
+
+	router.setState(root)
 
 	return router, nil
 }
 
+// RouterSetup holds options to build router
 type RouterSetup struct {
-	States []StateSetup
+	States       []StateSetup
+	GetStateFn   func(*Turn) (*State, error)
+	StoreStateFn func(*State) error
 }
 
 type StateSetup struct {

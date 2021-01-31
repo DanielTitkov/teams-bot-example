@@ -5,6 +5,17 @@ import (
 	"testing"
 )
 
+var storedState *State
+
+func storeStateFn(state *State) error {
+	storedState = state
+	return nil
+}
+
+func getStateFn(turn *Turn) (*State, error) {
+	return storedState, nil
+}
+
 func createProjectFn(turn *Turn, data map[string]interface{}) (reply *Turn, err error) {
 	fmt.Println("running create project")
 	return turn, nil
@@ -22,9 +33,11 @@ func listProjectsFn(turn *Turn, data map[string]interface{}) (reply *Turn, err e
 
 func TestNonUniqueStates(t *testing.T) {
 	setup := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
 		States: []StateSetup{
 			{
-				Title: "state1",
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						TriggerText: "Создать проект",
@@ -34,7 +47,7 @@ func TestNonUniqueStates(t *testing.T) {
 				Default: ActionSetup{},
 			},
 			{
-				Title: "state1",
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						TriggerTextRgxp: ".*",
@@ -51,11 +64,79 @@ func TestNonUniqueStates(t *testing.T) {
 	}
 }
 
-func TestIncorrectTransitions(t *testing.T) {
+func TestActionNoFunction(t *testing.T) {
 	setup := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
+		States: []StateSetup{
+			{
+				Title: "root",
+				Actions: []ActionSetup{
+					{
+						TriggerText: "Создать проект",
+					},
+				},
+				Default: ActionSetup{},
+			},
+		},
+	}
+
+	if _, err := NewRouter(setup); err == nil {
+		t.Error("expected to get an error, but got nil")
+	}
+}
+
+func TestNoRootState(t *testing.T) {
+	setup := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
 		States: []StateSetup{
 			{
 				Title: "state1",
+				Actions: []ActionSetup{
+					{
+						TriggerText: "Создать проект",
+						Function:    addProjectTitleFn,
+					},
+				},
+				Default: ActionSetup{},
+			},
+		},
+	}
+
+	if _, err := NewRouter(setup); err == nil {
+		t.Error("expected to get an error, but got nil")
+	}
+}
+
+func TestNoStateFunctions(t *testing.T) {
+	setup := RouterSetup{
+		States: []StateSetup{
+			{
+				Title: "root",
+				Actions: []ActionSetup{
+					{
+						TriggerText: "Создать проект",
+						Function:    addProjectTitleFn,
+					},
+				},
+				Default: ActionSetup{},
+			},
+		},
+	}
+
+	if _, err := NewRouter(setup); err == nil {
+		t.Error("expected to get an error, but got nil")
+	}
+}
+
+func TestIncorrectTransitions(t *testing.T) {
+	setup := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
+		States: []StateSetup{
+			{
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						TriggerText:         "Создать проект",
@@ -73,9 +154,11 @@ func TestIncorrectTransitions(t *testing.T) {
 	}
 
 	setup2 := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
 		States: []StateSetup{
 			{
-				Title: "state1",
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						TriggerText:      "Создать проект",
@@ -95,9 +178,11 @@ func TestIncorrectTransitions(t *testing.T) {
 
 func TestMulptipleTriggers(t *testing.T) {
 	setup := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
 		States: []StateSetup{
 			{
-				Title: "state1",
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						TriggerText:     "Создать проект",
@@ -115,9 +200,11 @@ func TestMulptipleTriggers(t *testing.T) {
 	}
 
 	setup2 := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
 		States: []StateSetup{
 			{
-				Title: "state1",
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						TriggerText:          "Создать проект",
@@ -135,9 +222,11 @@ func TestMulptipleTriggers(t *testing.T) {
 	}
 
 	setup3 := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
 		States: []StateSetup{
 			{
-				Title: "state1",
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						TriggerTextRgxp:      "Создать проект",
@@ -157,9 +246,11 @@ func TestMulptipleTriggers(t *testing.T) {
 
 func TestNoTriggers(t *testing.T) {
 	setup := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
 		States: []StateSetup{
 			{
-				Title: "state1",
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						Function: createProjectFn,
@@ -171,15 +262,17 @@ func TestNoTriggers(t *testing.T) {
 	}
 
 	if _, err := NewRouter(setup); err == nil {
-		t.Error("expected to get an error, but got nil")
+		t.Error("expected to get an error, but got nil") // TODO: check error type
 	}
 }
 
 func TestRepeatedTriggers(t *testing.T) {
 	setup := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
 		States: []StateSetup{
 			{
-				Title: "state1",
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						TriggerText: "Создать проект",
@@ -200,9 +293,11 @@ func TestRepeatedTriggers(t *testing.T) {
 	}
 
 	setup2 := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
 		States: []StateSetup{
 			{
-				Title: "state1",
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						TriggerPayloadAction: "action",
@@ -223,9 +318,11 @@ func TestRepeatedTriggers(t *testing.T) {
 	}
 
 	setup3 := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
 		States: []StateSetup{
 			{
-				Title: "state1",
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						TriggerTextRgxp: ".*",
@@ -248,9 +345,11 @@ func TestRepeatedTriggers(t *testing.T) {
 
 func TestBadRgxpTrigger(t *testing.T) {
 	setup := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
 		States: []StateSetup{
 			{
-				Title: "state1",
+				Title: "root",
 				Actions: []ActionSetup{
 					{
 						TriggerTextRgxp: "***",

@@ -59,34 +59,11 @@ func main() {
 		},
 	}
 
-	fmt.Println(setup)
-
-	createProjectAction := mesga.Action{
-		Title: "createProject",
-	}
-	addProjectTitleAction := mesga.Action{
-		Title: "addProjectTitle",
+	fmt.Printf("\nSETUP\n%+v\n", setup)
+	r, err := mesga.NewRouter(setup)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	rootState := mesga.State{
-		Title:          "root",
-		AllowedActions: []*mesga.Action{&createProjectAction},
-	}
-
-	createProjectState := mesga.State{
-		Title:          "createProject",
-		AllowedActions: []*mesga.Action{&addProjectTitleAction},
-	}
-
-	m := mesga.Router{
-		States: []*mesga.State{
-			&rootState,
-			&createProjectState,
-		},
-		Root:    &rootState,
-		Current: &rootState,
-	}
-
-	fmt.Println(m.Call(&addProjectTitleAction, &mesga.Turn{}))
-	fmt.Println(m.Call(&createProjectAction, &mesga.Turn{}))
+	fmt.Printf("\nROUTER\n%+v\n", r)
 }

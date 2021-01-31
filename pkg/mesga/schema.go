@@ -35,6 +35,11 @@ type (
 		Type  string
 		Value string // serialized payload // TODO: maybe have it as a map?
 	}
+	// PayloadHeader holds common fields to identify payload
+	PayloadHeader struct {
+		App    string
+		Action string
+	}
 	// Dialog holds dialog reference in different messagers
 	Dialog struct {
 		Teams    string // serialized reference

@@ -9,7 +9,6 @@ import (
 
 // Router is a state engine that manages dialog states
 type Router struct {
-	States  []*State
 	Root    *State
 	Current *State
 
@@ -23,6 +22,11 @@ type Router struct {
 
 // Respond generates new turn
 func (r *Router) Respond(turn *Turn) (*Turn, error) {
+	if turn.Message.Payload.Value != "" {
+		response, err := r.respondToPayload(turn)
+		return response, err // TODO: maybe process error in turn
+	}
+
 	return turn, nil
 }
 
