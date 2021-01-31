@@ -2,7 +2,6 @@ package mesga
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"sync"
 )
@@ -22,41 +21,38 @@ type Router struct {
 
 // Respond generates new turn
 func (r *Router) Respond(turn *Turn) (*Turn, error) {
+	current, err := r.getState(turn)
+	if err != nil {
+		return turn, err
+	}
+	r.mx.Lock()
+	r.Current = current
+	r.mx.Unlock() // FIXME
+
 	if turn.Message.Payload.Value != "" {
 		response, err := r.respondToPayload(turn)
 		return response, err // TODO: maybe process error in turn
 	}
 
-	return turn, nil
-}
-
-// Call tries to perform some action
-func (m *Router) Call(action *Action, turn *Turn) (reply *Turn, err error) {
-	// m.mx.Lock()
-	// defer m.mx.Unlock()
-
-	current, err := m.getState(turn)
-	if err != nil {
-		return reply, err
-	}
-
-	if !isAllowed(action, current.AllowedActions) {
-		return reply, fmt.Errorf("action %s is not allowed in state %s", action.Title, m.Current.Title)
-	}
-
-	reply, err = action.do(turn, current.Data)
-	if err != nil {
-		if action.OnFailTransition != nil {
-			m.setState(action.OnFailTransition)
+	response, ok, err := r.respondToText(turn)
+	if ok {
+		if err != nil {
+			return response, err
 		}
-		return reply, err
+		return response, nil
 	}
 
-	if action.OnSuccessTransition != nil {
-		m.setState(action.OnSuccessTransition)
+	response, ok, err = r.respondToRegexp(turn)
+	if ok {
+		if err != nil {
+			return response, err
+		}
+		return response, nil
 	}
 
-	return reply, nil
+	// TODO: process default
+
+	return turn, nil
 }
 
 func (m *Router) setState(state *State) {
@@ -114,13 +110,4 @@ func (a *Action) do(turn *Turn, data map[string]interface{}) (reply *Turn, err e
 		return reply, err
 	}
 	return res, nil
-}
-
-func isAllowed(action *Action, allowed []*Action) bool {
-	for _, a := range allowed {
-		if a.Title == action.Title {
-			return true
-		}
-	}
-	return false
 }
