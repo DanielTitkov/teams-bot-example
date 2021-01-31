@@ -66,4 +66,6 @@ func main() {
 	}
 
 	fmt.Printf("\nROUTER\n%+v\n", r)
+
+	// TODO: test responders
 }

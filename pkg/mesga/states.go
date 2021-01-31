@@ -19,47 +19,6 @@ type Router struct {
 	storeStateFn      func(*State) error          // for external state storage
 }
 
-// Respond generates new turn
-func (r *Router) Respond(turn *Turn) (*Turn, error) {
-	current, err := r.getState(turn)
-	if err != nil {
-		return turn, err
-	}
-	r.mx.Lock()
-	r.Current = current
-	r.mx.Unlock() // FIXME
-
-	if turn.Message.Payload.Value != "" {
-		response, err := r.respondToPayload(turn)
-		return response, err // TODO: maybe process error in turn
-	}
-
-	response, ok, err := r.respondToText(turn)
-	if ok {
-		if err != nil {
-			return response, err
-		}
-		return response, nil
-	}
-
-	response, ok, err = r.respondToRegexp(turn)
-	if ok {
-		if err != nil {
-			return response, err
-		}
-		return response, nil
-	}
-
-	if current.defaultAction != nil {
-		defaultResponse, err := r.respondDefault(turn)
-		if err != nil {
-			return defaultResponse, err
-		}
-	}
-
-	return turn, nil
-}
-
 func (m *Router) setState(state *State) {
 	m.mx.Lock()
 	defer m.mx.Unlock()
