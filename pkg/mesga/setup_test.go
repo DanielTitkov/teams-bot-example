@@ -86,6 +86,25 @@ func TestActionNoFunction(t *testing.T) {
 	}
 }
 
+func TestInvalidDefault(t *testing.T) {
+	setup := RouterSetup{
+		GetStateFn:   getStateFn,
+		StoreStateFn: storeStateFn,
+		States: []StateSetup{
+			{
+				Title: "root",
+				Default: ActionSetup{
+					Function:            createProjectFn,
+					OnSuccessTransition: "state1",
+				},
+			},
+		},
+	}
+	if _, err := NewRouter(setup); err == nil {
+		t.Error("expected to get an error, but got nil")
+	}
+}
+
 func TestNoRootState(t *testing.T) {
 	setup := RouterSetup{
 		GetStateFn:   getStateFn,

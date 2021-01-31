@@ -44,29 +44,22 @@ func NewRouter(setup RouterSetup) (*Router, error) {
 		textRgxpActionMapping := make(map[*regexp.Regexp]*Action)
 		regexpMapping := make(map[string]struct{}) // for regexp validaion
 
+		// set state default action
+		if stateSetup.Default.Function != nil {
+			if err := stateSetup.Default.validate(stateMapping, false); err != nil {
+				return nil, err
+			}
+			state.defaultAction = &Action{
+				OnSuccessTransition: stateMapping[stateSetup.Default.OnSuccessTransition],
+				OnFailTransition:    stateMapping[stateSetup.Default.OnFailTransition],
+				fn:                  stateSetup.Default.Function,
+			}
+		}
+
+		// set state actions
 		for _, actionSetup := range stateSetup.Actions {
-			if actionSetup.Function == nil {
-				return nil, errors.New("action must have function")
-			}
-
-			if actionSetup.OnSuccessTransition != "" {
-				if _, ok := stateMapping[actionSetup.OnSuccessTransition]; !ok {
-					return nil, errors.New("action declares transition to an unknown state: " + actionSetup.OnSuccessTransition)
-				}
-			}
-			if actionSetup.OnFailTransition != "" {
-				if _, ok := stateMapping[actionSetup.OnFailTransition]; !ok {
-					return nil, errors.New("action declares transition to an unknown state: " + actionSetup.OnFailTransition)
-				}
-			}
-
-			// validate action has only one trigger
-			if !xor(
-				actionSetup.TriggerText != "",
-				actionSetup.TriggerTextRgxp != "",
-				actionSetup.TriggerPayloadAction != "",
-			) {
-				return nil, errors.New("action must have exactly one trigger")
+			if err := actionSetup.validate(stateMapping, true); err != nil {
+				return nil, err
 			}
 
 			action := &Action{
@@ -106,9 +99,7 @@ func NewRouter(setup RouterSetup) (*Router, error) {
 			state.textRgxpActionMapping = textRgxpActionMapping
 		}
 		// TODO:
-		// add state functions
-		// add root and current
-		// add state callbacks
+		// add state callbacks?
 		// add systems
 		// add proactive stack?
 	}
@@ -162,4 +153,31 @@ func xor(bools ...bool) bool {
 		return true
 	}
 	return false
+}
+
+func (s *ActionSetup) validate(stateMapping map[string]*State, validateTriggers bool) error {
+	if s.Function == nil {
+		return errors.New("action must have function")
+	}
+
+	if s.OnSuccessTransition != "" {
+		if _, ok := stateMapping[s.OnSuccessTransition]; !ok {
+			return errors.New("action declares transition to an unknown state: " + s.OnSuccessTransition)
+		}
+	}
+	if s.OnFailTransition != "" {
+		if _, ok := stateMapping[s.OnFailTransition]; !ok {
+			return errors.New("action declares transition to an unknown state: " + s.OnFailTransition)
+		}
+	}
+
+	// validate action has only one trigger
+	if validateTriggers && !xor(
+		s.TriggerText != "",
+		s.TriggerTextRgxp != "",
+		s.TriggerPayloadAction != "",
+	) {
+		return errors.New("action must have exactly one trigger")
+	}
+	return nil
 }

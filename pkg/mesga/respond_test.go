@@ -9,6 +9,11 @@ func sayOkFn(turn *Turn, data map[string]interface{}) (reply *Turn, err error) {
 	return turn, nil
 }
 
+func defaultResponseFn(turn *Turn, data map[string]interface{}) (reply *Turn, err error) {
+	turn.Message.Text = "default response"
+	return turn, nil
+}
+
 var setup = RouterSetup{
 	GetStateFn:   getStateFn,
 	StoreStateFn: storeStateFn,
@@ -29,7 +34,9 @@ var setup = RouterSetup{
 					Function:        sayOkFn,
 				},
 			},
-			Default: ActionSetup{},
+			Default: ActionSetup{
+				Function: defaultResponseFn,
+			},
 		},
 	},
 }
@@ -156,5 +163,31 @@ func TestRespondToRegexp2(t *testing.T) {
 
 	if resp.Message.Text != "ok" {
 		t.Errorf("expexted to get ok, got '%s'", resp.Message.Text)
+	}
+}
+
+func TestDefaultResponse(t *testing.T) {
+	turn := &Turn{
+		Message: Message{
+			Text: "wtf",
+		},
+	}
+
+	r, err := NewRouter(setup)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resp, err := r.Respond(turn)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resp.Message.Text == "" {
+		t.Fatal("got empty response")
+	}
+
+	if resp.Message.Text != "default response" {
+		t.Errorf("expexted to get default response, got '%s'", resp.Message.Text)
 	}
 }

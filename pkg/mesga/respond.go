@@ -81,3 +81,19 @@ func (r *Router) respondToRegexp(turn *Turn) (*Turn, bool, error) {
 
 	return turn, false, nil // action not found
 }
+
+func (r *Router) respondDefault(turn *Turn) (*Turn, error) {
+	reply, err := r.Current.defaultAction.do(turn, r.Current.Data)
+	if err != nil {
+		if r.Current.defaultAction.OnFailTransition != nil {
+			r.setState(r.Current.defaultAction.OnFailTransition)
+		}
+		return reply, err
+	}
+
+	if r.Current.defaultAction.OnSuccessTransition != nil {
+		r.setState(r.Current.defaultAction.OnSuccessTransition)
+	}
+
+	return reply, nil
+}

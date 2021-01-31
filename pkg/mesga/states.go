@@ -50,7 +50,12 @@ func (r *Router) Respond(turn *Turn) (*Turn, error) {
 		return response, nil
 	}
 
-	// TODO: process default
+	if current.defaultAction != nil {
+		defaultResponse, err := r.respondDefault(turn)
+		if err != nil {
+			return defaultResponse, err
+		}
+	}
 
 	return turn, nil
 }
@@ -89,7 +94,7 @@ type State struct {
 	textActionMapping     map[string]*Action
 	textRgxpActionMapping map[*regexp.Regexp]*Action
 	payloadActionMapping  map[string]*Action
-	// IsRoot           bool
+	defaultAction         *Action
 }
 
 // Action is something to do within state
